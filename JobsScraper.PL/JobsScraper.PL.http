@@ -1,0 +1,6 @@
+@JobsScraper.PL_HostAddress = http://localhost:5280
+
+GET {{JobsScraper.PL_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
