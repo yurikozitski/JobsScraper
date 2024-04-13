@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JobsScraper.BLL.Interfaces
+namespace JobsScraper.BLL.Enums
 {
-    public interface IDjinniRequestStringBuilder : IRequestStringBuilder
+    public enum JobBoards
     {
+        Djinni = 1,
+        Dou,
     }
 }

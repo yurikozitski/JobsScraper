@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace JobsScraper.BLL.Interfaces
 {
-    public interface IJobBoardVacancyService
+    public interface IHtmlParser
     {
-        IEnumerable<Vacancy> GetJobBoardVacancies(JobSearchModel jobSearchModel);
+        Task<IEnumerable<Vacancy>> ParseJobBoardHTML(string jobBoardHTML);
     }
 }
