@@ -23,7 +23,7 @@ namespace JobsScraper.BLL.Services.Djinni
             AddJobStackPath(requestStringBuilder, jobSearchModel.JobStack);
             AddJobTypesPath(requestStringBuilder, jobSearchModel.JobType);
             AddCountryPath(requestStringBuilder, jobSearchModel.Country);
-            AddLocationPath(requestStringBuilder, jobSearchModel.Location);
+            AddCityPath(requestStringBuilder, jobSearchModel.City);
             AddExperienceLevelPath(requestStringBuilder, jobSearchModel.ExperienceLevel);
             AddGradePath(requestStringBuilder, jobSearchModel.Grade);
             AddSalaryPath(requestStringBuilder, jobSearchModel.SalaryFrom);
@@ -37,7 +37,7 @@ namespace JobsScraper.BLL.Services.Djinni
 
         private static void AddJobStackPath(StringBuilder sb, JobStacks jobStacks)
         {
-            sb.Append("primary_keyword=");
+            sb.Append("?primary_keyword=");
             sb.Append(jobStacks.ToQueryParam(JobBoards.Djinni));
         }
 
@@ -56,37 +56,75 @@ namespace JobsScraper.BLL.Services.Djinni
             }
         }
 
-        private static void AddCountryPath(StringBuilder sb, string? countryString)
+        private static void AddCountryPath(StringBuilder sb, Countries? countries)
         {
-            if(countryString != null)
+            if(countries != null)
             {
-                string[] countries = countryString.Split("+");
-
-                if (countries.Contains("Ukraine"))
+                if (((Countries)countries).HasFlag(Countries.Ukraine))
                     sb.Append("&region=UKR");
 
-                if (countries.Contains("EU"))
+                if (((Countries)countries).HasFlag(Countries.Poland))
+                    sb.Append("&region=POL");
+
+                if (((Countries)countries).HasFlag(Countries.EU))
                     sb.Append("&region=eu");
 
-                if (countries.Contains("Other"))
+                if (((Countries)countries).HasFlag(Countries.Other))
                     sb.Append("&region=other");
             }
         }
 
-        private static void AddLocationPath(StringBuilder sb, string? locationString)
+        private static void AddCityPath(StringBuilder sb, Cities? cities)
         {
-            if (locationString != null)
+            if (cities != null)
             {
-                string[] locations = locationString.Split("+");
+                if (((Cities)cities).HasFlag(Cities.Kyiv))
+                    sb.Append("&location=kyiv");
 
-                if (locations.Contains("Ukraine"))
-                    sb.Append("&region=UKR");
+                if (((Cities)cities).HasFlag(Cities.Vinnytsia))
+                    sb.Append("&location=vinnytsia");
 
-                if (locations.Contains("EU"))
-                    sb.Append("&region=eu");
+                if (((Cities)cities).HasFlag(Cities.Dnipro))
+                    sb.Append("&location=dnipro");
 
-                if (locations.Contains("Other"))
-                    sb.Append("&region=other");
+                if (((Cities)cities).HasFlag(Cities.IvanoFrankivsk))
+                    sb.Append("&location=ivanofrankivsk");
+
+                if (((Cities)cities).HasFlag(Cities.Zhytomyr))
+                    sb.Append("&location=zhytomyr");
+
+                if (((Cities)cities).HasFlag(Cities.Zaporizhzhia))
+                    sb.Append("&location=zaporizhzhia");
+
+                if (((Cities)cities).HasFlag(Cities.Lviv))
+                    sb.Append("&location=lviv");
+
+                if (((Cities)cities).HasFlag(Cities.Mykolaiv))
+                    sb.Append("&location=mykolaiv");
+
+                if (((Cities)cities).HasFlag(Cities.Odesa))
+                    sb.Append("&location=odesa");
+
+                if (((Cities)cities).HasFlag(Cities.Ternopil))
+                    sb.Append("&location=ternopil");
+
+                if (((Cities)cities).HasFlag(Cities.Kharkiv))
+                    sb.Append("&location=kharkiv");
+
+                if (((Cities)cities).HasFlag(Cities.Khmelnytskyi))
+                    sb.Append("&location=khmelnytskyi");
+
+                if (((Cities)cities).HasFlag(Cities.Cherkasy))
+                    sb.Append("&location=cherkasy");
+
+                if (((Cities)cities).HasFlag(Cities.Chernihiv))
+                    sb.Append("&location=chernihiv");
+
+                if (((Cities)cities).HasFlag(Cities.Chernivtsi))
+                    sb.Append("&location=chernivtsi");
+
+                if (((Cities)cities).HasFlag(Cities.Uzhhorod))
+                    sb.Append("&location=uzhhorod");
             }
         }
 

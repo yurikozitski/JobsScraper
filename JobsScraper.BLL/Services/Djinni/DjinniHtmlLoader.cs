@@ -20,12 +20,25 @@ namespace JobsScraper.BLL.Services.Djinni
             this.httpClientFactory = httpClientFactory;
         }
 
-        public Task<string> LoadJobBoardHTML(JobSearchModel jobSearchModel)
+        public async Task<string?> LoadJobBoardHTMLAsync(JobSearchModel jobSearchModel)
         {
-            string requestString = djinniRequestStringBuilder.GetRequestString(jobSearchModel);
+            string requestString = this.djinniRequestStringBuilder.GetRequestString(jobSearchModel);
 
-            var httpClient = httpClientFactory.CreateClient();
-            return httpClient.GetStringAsync(requestString);
+            var httpClient = this.httpClientFactory.CreateClient();
+
+            string? djinniHtml = null;
+
+            try
+            {
+                djinniHtml = await httpClient.GetStringAsync(requestString);
+            }
+            catch (HttpRequestException ex)
+            {
+                //TODO Logging here
+                Console.WriteLine(ex.Message);
+            }
+
+            return djinniHtml;
         }
     }
 }

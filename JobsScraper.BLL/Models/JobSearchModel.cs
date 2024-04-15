@@ -13,9 +13,9 @@ namespace JobsScraper.BLL.Models
 
         public JobTypes? JobType { get; set; }
 
-        public string? Country { get; set; } //TODO use enum
+        public Countries? Country { get; set; } 
 
-        public string? Location { get; set; } //TODO use enum 
+        public Cities? City { get; set; } 
 
         public ExperienceLevels? ExperienceLevel { get; set; }
 

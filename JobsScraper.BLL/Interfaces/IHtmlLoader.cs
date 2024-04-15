@@ -9,6 +9,6 @@ namespace JobsScraper.BLL.Interfaces
 {
     public interface IHtmlLoader
     {
-        Task<string> LoadJobBoardHTML(JobSearchModel jobSearchModel);
+        Task<string?> LoadJobBoardHTMLAsync(JobSearchModel jobSearchModel);
     }
 }

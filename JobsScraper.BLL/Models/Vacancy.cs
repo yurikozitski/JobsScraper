@@ -19,11 +19,11 @@ namespace JobsScraper.BLL.Models
 
         public string? Salary { get; set; }
 
-        public JobTypes JobType { get; set; }
+        public string? JobType { get; set; }
 
         public string? Location { get; set; }
 
-        public string Description { get; set; } = default!;
+        public string? Description { get; set; }
 
         public DateOnly? PublicationDate { get; set; }
     }
