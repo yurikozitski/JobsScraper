@@ -2,6 +2,7 @@
 using JobsScraper.BLL.Extensions;
 using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +13,18 @@ namespace JobsScraper.BLL.Services.Djinni
 {
     public class DjinniRequestStringBuilder : IDjinniRequestStringBuilder
     {
-        private const string domain = "https://djinni.co/jobs/";
+        private readonly IConfiguration configuration;
 
-        public string RequestString { get; private set; } = domain;
+        public string RequestString { get; private set; } = default!;
+
+        public DjinniRequestStringBuilder(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
 
         public string GetRequestString(JobSearchModel jobSearchModel)
         {
-            StringBuilder requestStringBuilder = new StringBuilder(domain);
+            StringBuilder requestStringBuilder = new StringBuilder(this.configuration["Djinni:Domain"]);
 
             AddJobStackPath(requestStringBuilder, jobSearchModel.JobStack);
             AddJobTypesPath(requestStringBuilder, jobSearchModel.JobType);

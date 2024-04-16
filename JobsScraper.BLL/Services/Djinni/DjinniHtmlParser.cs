@@ -10,24 +10,29 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using JobsScraper.BLL.Enums;
 using System.Globalization;
+using Microsoft.Extensions.Configuration;
+using System.Runtime.CompilerServices;
 
 namespace JobsScraper.BLL.Services.Djinni
 {
     public class DjinniHtmlParser : IDjinniHtmlParser
     {
         private const string webSite = "Djinni";
-        private const string shortDomain = "https://djinni.co";
 
         private readonly IDjinniRequestStringBuilder djinniRequestStringBuilder;
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly IConfiguration configuration;
 
-        public DjinniHtmlParser(IDjinniRequestStringBuilder djinniRequestStringBuilder, IHttpClientFactory httpClientFactory)
+        public DjinniHtmlParser(IDjinniRequestStringBuilder djinniRequestStringBuilder, 
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration)
         {
             this.djinniRequestStringBuilder = djinniRequestStringBuilder;
             this.httpClientFactory = httpClientFactory;
+            this.configuration = configuration;
         }
 
-        public Task<IEnumerable<Vacancy>> ParseJobBoardHTMLAsync(string jobBoardHTML)
+        public Task<IEnumerable<Vacancy>> ParseJobBoardHTMLAsync(string jobBoardHTML, CancellationToken token)
         {
             return Task.Run(async () => {
 
@@ -39,30 +44,32 @@ namespace JobsScraper.BLL.Services.Djinni
                 var doc = new HtmlDocument();
                 doc.LoadHtml(jobBoardHTML);
 
-                var vacancyNodes = doc.DocumentNode.SelectNodes("//li[@class = 'list-jobs__item job-list__item']");
+                var vacancyNodes = doc.DocumentNode.SelectNodes(this.configuration["Djinni:XPaths:VacancyList"]);
 
                 if(vacancyNodes == null)
                 {
                     return Enumerable.Empty<Vacancy>();
                 }
 
-                var vacancies = GetVacancyList(vacancyNodes);
+                var vacancies = GetVacancyList(vacancyNodes, this.configuration, token);
 
-                int? numberOfAdditionalPages = GetNumberOfPages(doc.DocumentNode);
+                int? numberOfAdditionalPages = GetNumberOfPages(doc.DocumentNode, this.configuration);
 
                 if(numberOfAdditionalPages != null)
                 {
                     var additionalPages = await LoadAdditionalPagesAsync(
                         this.httpClientFactory.CreateClient(), 
                         this.djinniRequestStringBuilder.RequestString, 
-                        (int)numberOfAdditionalPages);
+                        (int)numberOfAdditionalPages,
+                        token);
 
                     foreach (string page in additionalPages)
                     {
                         var pageDoc = new HtmlDocument();
                         pageDoc.LoadHtml(page);
 
-                        vacancies.AddRange(GetVacancyList(pageDoc.DocumentNode.SelectNodes("//li[@class = 'list-jobs__item job-list__item']")));
+                        vacancies.AddRange(GetVacancyList(pageDoc.DocumentNode.SelectNodes("//li[@class = 'list-jobs__item job-list__item']"), 
+                            this.configuration, token));
                     }
                 }
 
@@ -70,13 +77,15 @@ namespace JobsScraper.BLL.Services.Djinni
             });
         }
 
-        private static List<Vacancy> GetVacancyList(HtmlNodeCollection vacancyNodes)
+        private static List<Vacancy> GetVacancyList(HtmlNodeCollection vacancyNodes, IConfiguration configuration, CancellationToken token)
         {
             List<Vacancy> vacancies = new();
 
             foreach (var vacancyNode in vacancyNodes)
             {
-                string? localLink = vacancyNode.SelectSingleNode(".//a[@class = 'h3 job-list-item__link']")?.Attributes["href"]?.Value
+                token.ThrowIfCancellationRequested();
+
+                string? localLink = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:LocalLink"])?.Attributes["href"]?.Value
                         .Replace("\n", String.Empty)
                         .Trim()!;
 
@@ -87,9 +96,9 @@ namespace JobsScraper.BLL.Services.Djinni
                     continue;
                 }
 
-                string link = shortDomain + localLink;
+                string link = configuration["Djinni:ShortDomain"] + localLink;
 
-                string jobTitle = vacancyNode.SelectSingleNode(".//a[@class = 'h3 job-list-item__link']")?.InnerText
+                string jobTitle = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:JobTitle"])?.InnerText
                         .Replace("\n", String.Empty)
                         .Trim()!;
 
@@ -100,7 +109,7 @@ namespace JobsScraper.BLL.Services.Djinni
                     continue;
                 }
 
-                string company = vacancyNode.SelectSingleNode(".//a[@class = 'mr-2']")?.InnerText
+                string company = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Company"])?.InnerText
                         .Replace("\n", String.Empty)
                         .Trim()!;
 
@@ -111,7 +120,7 @@ namespace JobsScraper.BLL.Services.Djinni
                     continue;
                 }
 
-                string? publicationDateString = vacancyNode.SelectSingleNode(".//span[@class = 'mr-2 nobr']")?.Attributes["title"]?.Value.Trim();
+                string? publicationDateString = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:PublicationDate"])?.Attributes["title"]?.Value.Trim();
                 DateOnly.TryParse(publicationDateString?.Substring(6), CultureInfo.GetCultureInfo("ru-RU"), out DateOnly publicationDate);
 
                 Vacancy vacancy = new Vacancy()
@@ -121,18 +130,18 @@ namespace JobsScraper.BLL.Services.Djinni
                     JobTitle = jobTitle,
                     Company = company,
 
-                    Salary = vacancyNode.SelectSingleNode(".//span[@class = 'public-salary-item']")?.InnerText
+                    Salary = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Salary"])?.InnerText
                         .Replace("\n", String.Empty)
                         .Trim(),
 
-                    JobType = GetJobType(vacancyNode),
+                    JobType = GetJobType(vacancyNode, configuration),
 
-                    Location = vacancyNode.SelectSingleNode(".//span[@class = 'location-text']")?.InnerText
+                    Location = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Location"])?.InnerText
                         .Replace("\n", String.Empty)
                         .Replace(" ", String.Empty)
                         .Trim(),
 
-                    Description = vacancyNode.SelectSingleNode(".//span[contains(@id, 'job-description')]")?.Attributes["data-truncated-text"]?.Value
+                    Description = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Description"])?.Attributes["data-truncated-text"]?.Value
                         .Replace("\n", String.Empty)
                         .Replace("\r", String.Empty)
                         .Replace("\t", String.Empty)
@@ -147,10 +156,10 @@ namespace JobsScraper.BLL.Services.Djinni
             return vacancies;
         }
 
-        private static int? GetNumberOfPages(HtmlNode document)
+        private static int? GetNumberOfPages(HtmlNode document, IConfiguration configuration)
         {
             int? numberOfPages = null;
-            var paginationNode = document.SelectSingleNode("//ul[@class = 'pagination pagination_with_numbers']");
+            var paginationNode = document.SelectSingleNode(configuration["Djinni:XPaths:Pagination"]);
 
             if (paginationNode != null &&
                 paginationNode.HasChildNodes && 
@@ -164,13 +173,13 @@ namespace JobsScraper.BLL.Services.Djinni
             return numberOfPages;
         }
 
-        private static async Task<IEnumerable<string>> LoadAdditionalPagesAsync(HttpClient httpClient, string requstPath, int numberOfPages)
+        private static async Task<IEnumerable<string>> LoadAdditionalPagesAsync(HttpClient httpClient, string requstPath, int numberOfPages, CancellationToken token)
         {
             List<Task<string>> pagesTasks = new ();
 
             for (int page = 2; page <= numberOfPages; page++)
             {
-                var pageTask = httpClient.GetStringAsync(requstPath + $"&page={page}");
+                var pageTask = httpClient.GetStringAsync(requstPath + $"&page={page}", token);
                 pagesTasks.Add(pageTask);
             }
 
@@ -190,13 +199,13 @@ namespace JobsScraper.BLL.Services.Djinni
             return pages.ToList();
         }
 
-        private static string? GetJobType(HtmlNode vacancyNode) 
+        private static string? GetJobType(HtmlNode vacancyNode, IConfiguration configuration) 
         {
             string? jobType = null;
 
             if(vacancyNode != null)
             {
-                var vacancyInfoNodes = vacancyNode.SelectSingleNode(".//div[@class = 'job-list-item__job-info font-weight-500']")?.ChildNodes
+                var vacancyInfoNodes = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:JobType"])?.ChildNodes
                     .Where(node => node.HasClass("nobr"))
                     .Select(node => node.ChildNodes[1]);
 

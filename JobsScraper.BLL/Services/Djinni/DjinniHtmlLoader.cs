@@ -20,7 +20,7 @@ namespace JobsScraper.BLL.Services.Djinni
             this.httpClientFactory = httpClientFactory;
         }
 
-        public async Task<string?> LoadJobBoardHTMLAsync(JobSearchModel jobSearchModel)
+        public async Task<string?> LoadJobBoardHTMLAsync(JobSearchModel jobSearchModel, CancellationToken token)
         {
             string requestString = this.djinniRequestStringBuilder.GetRequestString(jobSearchModel);
 
@@ -30,7 +30,7 @@ namespace JobsScraper.BLL.Services.Djinni
 
             try
             {
-                djinniHtml = await httpClient.GetStringAsync(requestString);
+                djinniHtml = await httpClient.GetStringAsync(requestString, token);
             }
             catch (HttpRequestException ex)
             {

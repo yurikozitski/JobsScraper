@@ -22,15 +22,18 @@ namespace JobsScraper.BLL.Services
             this.djinniHtmlParser = djinniHtmlParser;
         }
 
-        public async Task<IEnumerable<Vacancy>> GetVacanciesAsync(JobSearchModel jobSearchModel)
+        public async Task<IEnumerable<Vacancy>> GetVacanciesAsync(JobSearchModel jobSearchModel, CancellationToken token)
         {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+            cts.CancelAfter(TimeSpan.FromMilliseconds(10_000));
+
             List<Vacancy> vacancies = new ();
 
-            var djinniHtmlLoadTask = this.djinniHtmlLoader.LoadJobBoardHTMLAsync(jobSearchModel);
+            var djinniHtmlLoadTask = this.djinniHtmlLoader.LoadJobBoardHTMLAsync(jobSearchModel, cts.Token);
 
             await Task.WhenAll(djinniHtmlLoadTask);
 
-            var djinniHtmlPasreTask = this.djinniHtmlParser.ParseJobBoardHTMLAsync(djinniHtmlLoadTask.Result!);
+            var djinniHtmlPasreTask = this.djinniHtmlParser.ParseJobBoardHTMLAsync(djinniHtmlLoadTask.Result!, cts.Token);
 
             await Task.WhenAll(djinniHtmlPasreTask);
             
