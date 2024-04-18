@@ -1,11 +1,5 @@
-﻿using JobsScraper.BLL.Interfaces;
-using JobsScraper.BLL.Interfaces.Djinni;
+﻿using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JobsScraper.BLL.Services.Djinni
 {

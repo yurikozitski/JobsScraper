@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace JobsScraper.BLL.EnumDisplayAttributes
+﻿namespace JobsScraper.BLL.EnumDisplayAttributes
 {
     public abstract class ParamAttribute : Attribute
     {
+        public string Text { get; set; }
+
         protected ParamAttribute(string paramText)
         {
             this.Text = paramText;
         }
-
-        public string Text { get; set; }
     }
 }

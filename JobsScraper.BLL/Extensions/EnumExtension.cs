@@ -1,11 +1,6 @@
-﻿using JobsScraper.BLL.EnumDisplayAttributes;
+﻿using System.Reflection;
+using JobsScraper.BLL.EnumDisplayAttributes;
 using JobsScraper.BLL.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JobsScraper.BLL.Extensions
 {

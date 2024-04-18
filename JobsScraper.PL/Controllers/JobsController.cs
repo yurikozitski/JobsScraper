@@ -1,8 +1,5 @@
-﻿using JobsScraper.BLL.Exceptions;
-using JobsScraper.BLL.Interfaces;
+﻿using JobsScraper.BLL.Interfaces;
 using JobsScraper.BLL.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobsScraper.PL.Controllers
@@ -18,15 +15,14 @@ namespace JobsScraper.PL.Controllers
             this.vacancyService = vacancyService;
         }
 
-        
-        [HttpGet("find")]
-        public async Task<ActionResult<IEnumerable<Vacancy>>> GetJobs([FromQuery]JobSearchModel jobSearchModel, CancellationToken token)
-        {
-            IEnumerable<Vacancy> vacancies = new List<Vacancy>();
 
+        [HttpGet("find")]
+        public async Task<ActionResult<IEnumerable<Vacancy>>> GetJobs([FromQuery] JobSearchModel jobSearchModel, CancellationToken token)
+        {
             try
             {
-                vacancies = await this.vacancyService.GetVacanciesAsync(jobSearchModel, token);
+                var vacancies = await this.vacancyService.GetVacanciesAsync(jobSearchModel, token);
+                return Ok(vacancies);
             }
             catch (OperationCanceledException) when (!token.IsCancellationRequested)
             {
@@ -36,8 +32,6 @@ namespace JobsScraper.PL.Controllers
             {
                 return StatusCode(499);
             }
-
-            return Ok(vacancies);
         }
     }
 }

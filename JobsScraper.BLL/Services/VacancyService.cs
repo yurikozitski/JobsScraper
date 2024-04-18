@@ -1,13 +1,6 @@
-﻿using JobsScraper.BLL.Exceptions;
-using JobsScraper.BLL.Interfaces;
+﻿using JobsScraper.BLL.Interfaces;
 using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JobsScraper.BLL.Services
 {
@@ -27,7 +20,7 @@ namespace JobsScraper.BLL.Services
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
             cts.CancelAfter(TimeSpan.FromMilliseconds(10_000));
 
-            List<Vacancy> vacancies = new ();
+            List<Vacancy> vacancies = new();
 
             var djinniHtmlLoadTask = this.djinniHtmlLoader.LoadJobBoardHTMLAsync(jobSearchModel, cts.Token);
 
@@ -36,7 +29,7 @@ namespace JobsScraper.BLL.Services
             var djinniHtmlPasreTask = this.djinniHtmlParser.ParseJobBoardHTMLAsync(djinniHtmlLoadTask.Result!, cts.Token);
 
             await Task.WhenAll(djinniHtmlPasreTask);
-            
+
             vacancies.AddRange(djinniHtmlPasreTask.Result);
 
             return vacancies;

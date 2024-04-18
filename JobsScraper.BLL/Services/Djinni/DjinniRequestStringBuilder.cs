@@ -1,13 +1,9 @@
-﻿using JobsScraper.BLL.Enums;
+﻿using System.Text;
+using JobsScraper.BLL.Enums;
 using JobsScraper.BLL.Extensions;
 using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Models;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JobsScraper.BLL.Services.Djinni
 {
@@ -36,7 +32,7 @@ namespace JobsScraper.BLL.Services.Djinni
             AddEnglishLevelsPath(requestStringBuilder, jobSearchModel.EnglishLevel);
 
             string requestString = requestStringBuilder.ToString();
-            RequestString = requestString;
+            this.RequestString = requestString;
 
             return requestString;
         }
@@ -64,7 +60,7 @@ namespace JobsScraper.BLL.Services.Djinni
 
         private static void AddCountryPath(StringBuilder sb, Countries? countries)
         {
-            if(countries != null)
+            if (countries != null)
             {
                 if (((Countries)countries).HasFlag(Countries.Ukraine))
                     sb.Append("&region=UKR");

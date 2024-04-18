@@ -2,7 +2,6 @@ using JobsScraper.BLL.Interfaces;
 using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Services;
 using JobsScraper.BLL.Services.Djinni;
-using Microsoft.AspNetCore.Http.Timeouts;
 
 var builder = WebApplication.CreateBuilder(args);
 
