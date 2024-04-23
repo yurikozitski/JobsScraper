@@ -15,8 +15,10 @@ namespace JobsScraper.PL.Controllers
             this.vacancyService = vacancyService;
         }
 
-
         [HttpGet("find")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
         public async Task<ActionResult<IEnumerable<Vacancy>>> GetJobs([FromQuery] JobSearchModel jobSearchModel, CancellationToken token)
         {
             try
