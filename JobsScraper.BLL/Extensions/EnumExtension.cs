@@ -21,10 +21,10 @@ namespace JobsScraper.BLL.Extensions
                     jobBoardTypeAttribute = typeof(DjinniParamAttribute);
                 }
 
-                //if (jobBoard is JobBoards.Dou)
-                //{
-                //    jobBoardType = typeof(DouParamAttribute);
-                //}
+                if (jobBoard is JobBoards.Dou)
+                {
+                    jobBoardTypeAttribute = typeof(DouParamAttribute);
+                }
 
                 object[] attrs = memInfo[0].GetCustomAttributes(jobBoardTypeAttribute, false);
 

@@ -5,15 +5,19 @@ namespace JobsScraper.BLL.Enums
     public enum JobStacks
     {
         [DjinniParam("JavaScript")]
+        [DouParam("Front End")]
         JavaScriptFrontEnd = 1,
 
         [DjinniParam("Fullstack")]
+        [DouParam("Full Stack")]
         Fullstack,
 
         [DjinniParam("Java")]
+        [DouParam("Java")]
         Java,
 
         [DjinniParam(".NET")]
+        [DouParam(".NET")]
         CSharpDotNET,
 
         Python,

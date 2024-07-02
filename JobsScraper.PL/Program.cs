@@ -1,7 +1,9 @@
 using JobsScraper.BLL.Interfaces;
 using JobsScraper.BLL.Interfaces.Djinni;
+using JobsScraper.BLL.Interfaces.DOU;
 using JobsScraper.BLL.Services;
 using JobsScraper.BLL.Services.Djinni;
+using JobsScraper.BLL.Services.DOU;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,9 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IDjinniHtmlLoader, DjinniHtmlLoader>();
 builder.Services.AddScoped<IDjinniHtmlParser, DjinniHtmlParser>();
 builder.Services.AddScoped<IDjinniRequestStringBuilder, DjinniRequestStringBuilder>();
+
+builder.Services.AddScoped<IDouHtmlLoader, DouHtmlLoader>();
+builder.Services.AddScoped<IDouRequestStringBuilder, DouRequestStringBuilder>();
 
 builder.Services.AddScoped<IVacancyService, VacancyService>();
 
