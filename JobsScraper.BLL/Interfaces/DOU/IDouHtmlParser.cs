@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace JobsScraper.BLL.Interfaces.DOU
 {
-    public interface IDouRequestStringBuilder : IRequestStringBuilder
+    public interface IDouHtmlParser : IHtmlParser
     {
-
     }
 }

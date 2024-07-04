@@ -1,21 +1,15 @@
-﻿using JobsScraper.BLL.Enums;
+﻿using System.Text;
+using JobsScraper.BLL.Enums;
 using JobsScraper.BLL.Extensions;
 using JobsScraper.BLL.Interfaces.DOU;
 using JobsScraper.BLL.Models;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JobsScraper.BLL.Services.DOU
 {
     public class DouRequestStringBuilder : IDouRequestStringBuilder
     {
         private readonly IConfiguration configuration;
-
-        public string RequestString { get; private set; } = default!;
 
         public DouRequestStringBuilder(IConfiguration configuration)
         {
@@ -36,8 +30,6 @@ namespace JobsScraper.BLL.Services.DOU
             //AddEnglishLevelsPath(requestStringBuilder, jobSearchModel.EnglishLevel);
 
             string requestString = requestStringBuilder.ToString();
-            this.RequestString = requestString;
-
             return requestString;
         }
 

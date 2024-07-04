@@ -19,16 +19,14 @@
     "Domain": "https://jobs.dou.ua/vacancies/",
     "ShortDomain": "https://djinni.co",
     "XPaths": {
-      "VacancyList": "//li[@class = 'list-jobs__item job-list__item']",
-      "LocalLink": ".//a[@class = 'h3 job-list-item__link']",
-      "JobTitle": ".//a[@class = 'h3 job-list-item__link']",
-      "JobType": ".//div[@class = 'job-list-item__job-info font-weight-500']",
-      "Company": ".//a[@class = 'mr-2']",
-      "PublicationDate": ".//span[@class = 'mr-2 nobr']",
-      "Salary": ".//span[@class = 'public-salary-item']",
-      "Location": ".//span[@class = 'location-text']",
-      "Description": ".//span[contains(@id, 'job-description')]",
-      "Pagination": "//ul[@class = 'pagination pagination_with_numbers']"
+      "LoadMoreButton": "div[class='more-btn']",
+      "VacancyList": "//li[@class = 'l-vacancy']",
+      "LinkTitle": ".//a[@class = 'vt']",
+      "JobTypeLocation": ".//span[@class = 'cities']",
+      "Company": ".//a[@class = 'company']",
+      "PublicationDate": ".//div[@class = 'date']",
+      "Salary": ".//span[@class = 'salary']",
+      "Description": ".//div[@class = 'sh-info']"
     }
   }
 }

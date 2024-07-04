@@ -16,6 +16,7 @@ builder.Services.AddScoped<IDjinniHtmlParser, DjinniHtmlParser>();
 builder.Services.AddScoped<IDjinniRequestStringBuilder, DjinniRequestStringBuilder>();
 
 builder.Services.AddScoped<IDouHtmlLoader, DouHtmlLoader>();
+builder.Services.AddScoped<IDouHtmlParser, DouHtmlParser>();
 builder.Services.AddScoped<IDouRequestStringBuilder, DouRequestStringBuilder>();
 
 builder.Services.AddScoped<IVacancyService, VacancyService>();

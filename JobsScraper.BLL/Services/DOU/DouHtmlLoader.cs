@@ -1,17 +1,21 @@
 ﻿using JobsScraper.BLL.Interfaces.DOU;
 using JobsScraper.BLL.Models;
+using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 
 namespace JobsScraper.BLL.Services.DOU
 {
     public class DouHtmlLoader : IDouHtmlLoader
     {
         private readonly IDouRequestStringBuilder douRequestStringBuilder;
+        private readonly IConfiguration configuration;
 
-        public DouHtmlLoader(IDouRequestStringBuilder douRequestStringBuilder)
+        public DouHtmlLoader(IDouRequestStringBuilder douRequestStringBuilder, IConfiguration configuration)
         {
             this.douRequestStringBuilder = douRequestStringBuilder;
+            this.configuration = configuration;
         }
 
         public Task<string?> LoadJobBoardHTMLAsync(JobSearchModel jobSearchModel, CancellationToken token)
@@ -28,18 +32,24 @@ namespace JobsScraper.BLL.Services.DOU
 
                 while (true)
                 {
-                    IWebElement loadMoreButton;
+                    if (token.IsCancellationRequested)
+                    {
+                        driver.Quit();
+                        token.ThrowIfCancellationRequested();
+                    }
+
+                    IWebElement? loadMoreButton;
 
                     try
                     {
-                        loadMoreButton = driver.FindElement(By.CssSelector("div[class='more-btn']")).FindElement(By.TagName("a"));
+                        loadMoreButton = driver.FindElement(By.CssSelector(this.configuration["DOU:XPaths:LoadMoreButton"])).FindElement(By.TagName("a"));
                     }
                     catch (NoSuchElementException)
                     {
                         break;
                     }
 
-                    if (!loadMoreButton.Displayed)
+                    if (loadMoreButton == null || !loadMoreButton.Displayed)
                     {
                         break;
                     }
