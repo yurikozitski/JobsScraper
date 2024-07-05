@@ -1,36 +1,25 @@
 ﻿using HtmlAgilityPack;
 using JobsScraper.BLL.Enums;
-using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Interfaces.DOU;
 using JobsScraper.BLL.Models;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JobsScraper.BLL.Services.DOU
 {
     public class DouHtmlParser : IDouHtmlParser
     {
         private const string WebSiteName = "DOU";
-
-        private readonly IDouRequestStringBuilder douRequestStringBuilder;
         private readonly IConfiguration configuration;
 
         public DouHtmlParser(
-            IDouRequestStringBuilder douRequestStringBuilder,
             IConfiguration configuration)
         {
-            this.douRequestStringBuilder = douRequestStringBuilder;
             this.configuration = configuration;
         }
 
         public Task<IEnumerable<Vacancy>> ParseJobBoardHTMLAsync(string jobBoardHTML, CancellationToken token)
         {
-            return Task.Run(async () =>
+            return Task.Run(() =>
             {
                 if (jobBoardHTML == null)
                 {
@@ -48,28 +37,6 @@ namespace JobsScraper.BLL.Services.DOU
                 }
 
                 var vacancies = GetVacancyList(vacancyNodes, this.configuration, token);
-
-                //int? numberOfAdditionalPages = GetNumberOfPages(doc.DocumentNode, this.configuration);
-
-                //if (numberOfAdditionalPages != null)
-                //{
-                //    var additionalPages = await LoadAdditionalPagesAsync(
-                //        this.httpClientFactory.CreateClient(),
-                //        this.douRequestStringBuilder.RequestString,
-                //        (int)numberOfAdditionalPages,
-                //        token);
-
-                //    foreach (string page in additionalPages)
-                //    {
-                //        var pageDoc = new HtmlDocument();
-                //        pageDoc.LoadHtml(page);
-
-                //        vacancies.AddRange(GetVacancyList(
-                //            pageDoc.DocumentNode.SelectNodes("//li[@class = 'list-jobs__item job-list__item']"),
-                //            this.configuration,
-                //            token));
-                //    }
-                //}
 
                 return vacancies;
             });
@@ -187,49 +154,6 @@ namespace JobsScraper.BLL.Services.DOU
 
             return vacancies;
         }
-
-        //private static int? GetNumberOfPages(HtmlNode document, IConfiguration configuration)
-        //{
-        //    int? numberOfPages = null;
-        //    var paginationNode = document.SelectSingleNode(configuration["Djinni:XPaths:Pagination"]);
-
-        //    if (paginationNode != null &&
-        //        paginationNode.HasChildNodes &&
-        //        paginationNode.ChildNodes.Count >= 2)
-        //    {
-        //        var pagesString = paginationNode.ChildNodes[paginationNode.ChildNodes.Count - 4].ChildNodes[1].InnerText.Trim();
-        //        int.TryParse(pagesString, out int result);
-        //        numberOfPages = result;
-        //    }
-
-        //    return numberOfPages;
-        //}
-
-        //private static async Task<IEnumerable<string>> LoadAdditionalPagesAsync(HttpClient httpClient, string requstPath, int numberOfPages, CancellationToken token)
-        //{
-        //    List<Task<string>> pagesTasks = new();
-
-        //    for (int page = 2; page <= numberOfPages; page++)
-        //    {
-        //        var pageTask = httpClient.GetStringAsync(requstPath + $"&page={page}", token);
-        //        pagesTasks.Add(pageTask);
-        //    }
-
-        //    string[] pages;
-
-        //    try
-        //    {
-        //        pages = await Task.WhenAll(pagesTasks);
-        //    }
-        //    catch (HttpRequestException ex)
-        //    {
-        //        //TODO Log exeption
-        //        Console.WriteLine(ex.Message);
-        //        return Enumerable.Empty<string>();
-        //    }
-
-        //    return pages.ToList();
-        //}
 
         private static string? GetJobType(HtmlNode vacancyNode, IConfiguration configuration)
         {

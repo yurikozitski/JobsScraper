@@ -4,6 +4,7 @@ using JobsScraper.BLL.Interfaces.DOU;
 using JobsScraper.BLL.Services;
 using JobsScraper.BLL.Services.Djinni;
 using JobsScraper.BLL.Services.DOU;
+using JobsScraper.PL.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

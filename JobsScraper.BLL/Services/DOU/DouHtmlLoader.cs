@@ -3,7 +3,6 @@ using JobsScraper.BLL.Models;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
 
 namespace JobsScraper.BLL.Services.DOU
 {

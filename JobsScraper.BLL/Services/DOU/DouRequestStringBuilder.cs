@@ -26,8 +26,6 @@ namespace JobsScraper.BLL.Services.DOU
             AddCityPath(requestStringBuilder, jobSearchModel.City);
             AddExperienceLevelPath(requestStringBuilder, jobSearchModel.ExperienceLevel);
             AddGradePath(requestStringBuilder, jobSearchModel.Grade);
-            //AddSalaryPath(requestStringBuilder, jobSearchModel.SalaryFrom);
-            //AddEnglishLevelsPath(requestStringBuilder, jobSearchModel.EnglishLevel);
 
             string requestString = requestStringBuilder.ToString();
             return requestString;
@@ -191,38 +189,6 @@ namespace JobsScraper.BLL.Services.DOU
 
                 if (((Grades)grades).HasFlag(Grades.HeadChief))
                     sb.Append("&search=Chief Head");
-            }
-        }
-
-        private static void AddSalaryPath(StringBuilder sb, int? salary)
-        {
-            if (salary != null)
-            {
-                sb.Append($"&salary={salary}");
-            }
-        }
-
-        private static void AddEnglishLevelsPath(StringBuilder sb, EnglishLevels? englishLevels)
-        {
-            if (englishLevels != null)
-            {
-                if (((EnglishLevels)englishLevels).HasFlag(EnglishLevels.NoEnglish))
-                    sb.Append("&english_level=no_english");
-
-                if (((EnglishLevels)englishLevels).HasFlag(EnglishLevels.Elementary))
-                    sb.Append("&english_level=basic");
-
-                if (((EnglishLevels)englishLevels).HasFlag(EnglishLevels.PreIntermediate))
-                    sb.Append("&english_level=pre");
-
-                if (((EnglishLevels)englishLevels).HasFlag(EnglishLevels.Intermediate))
-                    sb.Append("&english_level=intermediate");
-
-                if (((EnglishLevels)englishLevels).HasFlag(EnglishLevels.UpperIntermediate))
-                    sb.Append("&english_level=upper");
-
-                if (((EnglishLevels)englishLevels).HasFlag(EnglishLevels.Fluent))
-                    sb.Append("&english_level=fluent");
             }
         }
     }

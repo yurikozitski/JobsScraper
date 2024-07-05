@@ -20,7 +20,10 @@ namespace JobsScraper.BLL.Enums
         [DouParam(".NET")]
         CSharpDotNET,
 
+        [DjinniParam("Python")]
+        [DouParam("Python")]
         Python,
+
         PHP,
         NodeJs,
         iOS,
