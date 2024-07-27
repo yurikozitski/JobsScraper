@@ -8,6 +8,5 @@ namespace JobsScraper.BLL.Interfaces.DOU
 {
     public interface IDouRequestStringBuilder : IRequestStringBuilder
     {
-
     }
 }

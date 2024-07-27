@@ -4,6 +4,6 @@ namespace JobsScraper.BLL.Interfaces
 {
     public interface IHtmlParser
     {
-        Task<IEnumerable<Vacancy>> ParseJobBoardHTMLAsync(string jobBoardHTML, CancellationToken token);
+        Task<IEnumerable<Vacancy>> ParseJobBoardHTMLAsync(string? jobBoardHTML, CancellationToken token);
     }
 }

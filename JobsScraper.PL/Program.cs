@@ -5,46 +5,67 @@ using JobsScraper.BLL.Services;
 using JobsScraper.BLL.Services.Djinni;
 using JobsScraper.BLL.Services.DOU;
 using JobsScraper.PL.Middleware;
+using NLog;
+using NLog.Web;
 
-var builder = WebApplication.CreateBuilder(args);
+var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-
-builder.Services.AddScoped<IDjinniHtmlLoader, DjinniHtmlLoader>();
-builder.Services.AddScoped<IDjinniHtmlParser, DjinniHtmlParser>();
-builder.Services.AddScoped<IDjinniRequestStringBuilder, DjinniRequestStringBuilder>();
-
-builder.Services.AddScoped<IDouHtmlLoader, DouHtmlLoader>();
-builder.Services.AddScoped<IDouHtmlParser, DouHtmlParser>();
-builder.Services.AddScoped<IDouRequestStringBuilder, DouRequestStringBuilder>();
-
-builder.Services.AddScoped<IVacancyService, VacancyService>();
-
-builder.Services.AddHttpClient();
-
-builder.Configuration.AddJsonFile("parsingconfig.json");
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Add services to the container.
+
+    builder.Services.AddControllers();
+
+    builder.Services.AddScoped<IDjinniHtmlLoader, DjinniHtmlLoader>();
+    builder.Services.AddScoped<IDjinniHtmlParser, DjinniHtmlParser>();
+    builder.Services.AddScoped<IDjinniRequestStringBuilder, DjinniRequestStringBuilder>();
+    builder.Services.AddScoped<IDjinniVacancyService, DjinniVacancyService>();
+
+    builder.Services.AddScoped<IDouHtmlLoader, DouHtmlLoader>();
+    builder.Services.AddScoped<IDouHtmlParser, DouHtmlParser>();
+    builder.Services.AddScoped<IDouRequestStringBuilder, DouRequestStringBuilder>();
+    builder.Services.AddScoped<IDouVacancyService, DouVacancyService>();
+
+    builder.Services.AddScoped<IVacancyService, VacancyService>();
+
+    builder.Services.AddHttpClient();
+
+    builder.Configuration.AddJsonFile("parsingconfig.json");
+
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
+
+    var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseMiddleware<ErrorHandlingMiddleware>();
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
 }
-
-app.UseMiddleware<ErrorHandlingMiddleware>();
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+catch (Exception exception)
+{
+    logger.Error(exception, "Stopped program because of exception");
+    throw;
+}
+finally
+{
+    NLog.LogManager.Shutdown();
+}

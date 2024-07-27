@@ -11,7 +11,7 @@
       "PublicationDate": ".//span[@class = 'mr-2 nobr']",
       "Salary": ".//span[@class = 'public-salary-item']",
       "Location": ".//span[@class = 'location-text']",
-      "Description": ".//span[contains(@id, 'job-description')]",
+      "Description": ".//div[contains(@id, 'job-description')]",
       "Pagination": "//ul[@class = 'pagination pagination_with_numbers']"
     }
   },

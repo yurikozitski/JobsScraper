@@ -3,6 +3,7 @@ using JobsScraper.BLL.Enums;
 using JobsScraper.BLL.Interfaces.DOU;
 using JobsScraper.BLL.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace JobsScraper.BLL.Services.DOU
 {
@@ -10,19 +11,23 @@ namespace JobsScraper.BLL.Services.DOU
     {
         private const string WebSiteName = "DOU";
         private readonly IConfiguration configuration;
+        private readonly ILogger<DouHtmlParser> logger;
 
         public DouHtmlParser(
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<DouHtmlParser> logger)
         {
             this.configuration = configuration;
+            this.logger = logger;
         }
 
-        public Task<IEnumerable<Vacancy>> ParseJobBoardHTMLAsync(string jobBoardHTML, CancellationToken token)
+        public Task<IEnumerable<Vacancy>> ParseJobBoardHTMLAsync(string? jobBoardHTML, CancellationToken token)
         {
             return Task.Run(() =>
             {
-                if (jobBoardHTML == null)
+                if (string.IsNullOrEmpty(jobBoardHTML))
                 {
+                    this.logger.LogError($"Attempt to parse null or empty html string from {nameof(JobBoards.Dou)}");
                     return Enumerable.Empty<Vacancy>();
                 }
 
@@ -33,16 +38,18 @@ namespace JobsScraper.BLL.Services.DOU
 
                 if (vacancyNodes == null)
                 {
+                    string message = $"Can't get vacancy nodes from {nameof(JobBoards.Dou)}, XPath: {this.configuration["DOU:XPaths:VacancyList"]}";
+                    this.logger.LogError(message);
                     return Enumerable.Empty<Vacancy>();
                 }
 
-                var vacancies = GetVacancyList(vacancyNodes, this.configuration, token);
+                var vacancies = this.GetVacancyList(vacancyNodes, this.configuration, token);
 
                 return vacancies;
             });
         }
 
-        private static List<Vacancy> GetVacancyList(HtmlNodeCollection vacancyNodes, IConfiguration configuration, CancellationToken token)
+        private List<Vacancy> GetVacancyList(HtmlNodeCollection vacancyNodes, IConfiguration configuration, CancellationToken token)
         {
             List<Vacancy> vacancies = new();
 
@@ -56,8 +63,8 @@ namespace JobsScraper.BLL.Services.DOU
 
                 if (link == null)
                 {
-                    var message = $"Can't parse local link from {nameof(JobBoards.Dou)}, XPath is";
-                    Console.WriteLine(message);
+                    var message = $"Can't parse local link from {nameof(JobBoards.Dou)}, XPath is {configuration["DOU:XPaths:LinkTitle"]}";
+                    this.logger.LogError(message);
                     continue;
                 }
 
@@ -67,8 +74,8 @@ namespace JobsScraper.BLL.Services.DOU
 
                 if (jobTitle == null)
                 {
-                    var message = $"Can't parse job title from {nameof(JobBoards.Dou)}, XPath is";
-                    Console.WriteLine(message);
+                    var message = $"Can't parse job title from {nameof(JobBoards.Dou)}, XPath is {configuration["DOU:XPaths:LinkTitle"]}";
+                    this.logger.LogError(message);
                     continue;
                 }
 
@@ -79,8 +86,8 @@ namespace JobsScraper.BLL.Services.DOU
 
                 if (company == null)
                 {
-                    var message = $"Can't parse company name from {nameof(JobBoards.Dou)}, XPath is";
-                    Console.WriteLine(message);
+                    var message = $"Can't parse company name from {nameof(JobBoards.Dou)}, XPath is {configuration["Dou:XPaths:Company"]}";
+                    this.logger.LogError(message);
                     continue;
                 }
 
@@ -155,6 +162,7 @@ namespace JobsScraper.BLL.Services.DOU
             return vacancies;
         }
 
+#pragma warning disable SA1204 // StaticElementsMustAppearBeforeInstanceElements
         private static string? GetJobType(HtmlNode vacancyNode, IConfiguration configuration)
         {
             string? jobType = null;

@@ -1,5 +1,6 @@
 ﻿using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Models;
+using Microsoft.Extensions.Logging;
 
 namespace JobsScraper.BLL.Services.Djinni
 {
@@ -7,11 +8,16 @@ namespace JobsScraper.BLL.Services.Djinni
     {
         private readonly IDjinniRequestStringBuilder djinniRequestStringBuilder;
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly ILogger<DjinniHtmlLoader> logger;
 
-        public DjinniHtmlLoader(IDjinniRequestStringBuilder djinniRequestStringBuilder, IHttpClientFactory httpClientFactory)
+        public DjinniHtmlLoader(
+            IDjinniRequestStringBuilder djinniRequestStringBuilder,
+            IHttpClientFactory httpClientFactory,
+            ILogger<DjinniHtmlLoader> logger)
         {
             this.djinniRequestStringBuilder = djinniRequestStringBuilder;
             this.httpClientFactory = httpClientFactory;
+            this.logger = logger;
         }
 
         public async Task<string?> LoadJobBoardHTMLAsync(JobSearchModel jobSearchModel, CancellationToken token)
@@ -28,8 +34,7 @@ namespace JobsScraper.BLL.Services.Djinni
             }
             catch (HttpRequestException ex)
             {
-                //TODO Logging here
-                Console.WriteLine(ex.Message);
+                this.logger.LogError(ex, "Unable to load page from djiini");
             }
 
             return djinniHtml;

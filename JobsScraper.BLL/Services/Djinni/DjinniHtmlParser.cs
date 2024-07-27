@@ -4,6 +4,7 @@ using JobsScraper.BLL.Enums;
 using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace JobsScraper.BLL.Services.Djinni
 {
@@ -14,23 +15,27 @@ namespace JobsScraper.BLL.Services.Djinni
         private readonly IDjinniRequestStringBuilder djinniRequestStringBuilder;
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IConfiguration configuration;
+        private readonly ILogger<DjinniHtmlParser> logger;
 
         public DjinniHtmlParser(
             IDjinniRequestStringBuilder djinniRequestStringBuilder,
             IHttpClientFactory httpClientFactory,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<DjinniHtmlParser> logger)
         {
             this.djinniRequestStringBuilder = djinniRequestStringBuilder;
             this.httpClientFactory = httpClientFactory;
             this.configuration = configuration;
+            this.logger = logger;
         }
 
-        public Task<IEnumerable<Vacancy>> ParseJobBoardHTMLAsync(string jobBoardHTML, CancellationToken token)
+        public Task<IEnumerable<Vacancy>> ParseJobBoardHTMLAsync(string? jobBoardHTML, CancellationToken token)
         {
             return Task.Run(async () =>
             {
-                if (jobBoardHTML == null)
+                if (string.IsNullOrEmpty(jobBoardHTML))
                 {
+                    this.logger.LogError($"Attempt to parse null or empty html string from {nameof(JobBoards.Djinni)}");
                     return Enumerable.Empty<Vacancy>();
                 }
 
@@ -41,16 +46,18 @@ namespace JobsScraper.BLL.Services.Djinni
 
                 if (vacancyNodes == null)
                 {
+                    string message = $"Can't get vacancy nodes from {nameof(JobBoards.Djinni)}, XPath: {this.configuration["Djinni:XPaths:VacancyList"]}";
+                    this.logger.LogError(message);
                     return Enumerable.Empty<Vacancy>();
                 }
 
-                var vacancies = GetVacancyList(vacancyNodes, this.configuration, token);
+                var vacancies = this.GetVacancyList(vacancyNodes, this.configuration, token);
 
                 int? numberOfAdditionalPages = GetNumberOfPages(doc.DocumentNode, this.configuration);
 
                 if (numberOfAdditionalPages != null)
                 {
-                    var additionalPages = await LoadAdditionalPagesAsync(
+                    var additionalPages = await this.LoadAdditionalPagesAsync(
                         this.httpClientFactory.CreateClient(),
                         this.djinniRequestStringBuilder.RequestString,
                         (int)numberOfAdditionalPages,
@@ -61,7 +68,7 @@ namespace JobsScraper.BLL.Services.Djinni
                         var pageDoc = new HtmlDocument();
                         pageDoc.LoadHtml(page);
 
-                        vacancies.AddRange(GetVacancyList(
+                        vacancies.AddRange(this.GetVacancyList(
                             pageDoc.DocumentNode.SelectNodes("//li[@class = 'list-jobs__item job-list__item']"),
                             this.configuration,
                             token));
@@ -72,7 +79,7 @@ namespace JobsScraper.BLL.Services.Djinni
             });
         }
 
-        private static List<Vacancy> GetVacancyList(HtmlNodeCollection vacancyNodes, IConfiguration configuration, CancellationToken token)
+        private List<Vacancy> GetVacancyList(HtmlNodeCollection vacancyNodes, IConfiguration configuration, CancellationToken token)
         {
             List<Vacancy> vacancies = new();
 
@@ -86,8 +93,8 @@ namespace JobsScraper.BLL.Services.Djinni
 
                 if (localLink == null)
                 {
-                    var message = $"Can't parse local link from {nameof(JobBoards.Djinni)}, XPath is";
-                    Console.WriteLine(message);
+                    var message = $"Can't parse local link from {nameof(JobBoards.Djinni)}, XPath is {configuration["Djinni:XPaths:LocalLink"]}";
+                    this.logger.LogError(message);
                     continue;
                 }
 
@@ -99,8 +106,8 @@ namespace JobsScraper.BLL.Services.Djinni
 
                 if (jobTitle == null)
                 {
-                    var message = $"Can't parse job title from {nameof(JobBoards.Djinni)}, XPath is";
-                    Console.WriteLine(message);
+                    var message = $"Can't parse job title from {nameof(JobBoards.Djinni)}, XPath is {configuration["Djinni:XPaths:JobTitle"]}";
+                    this.logger.LogError(message);
                     continue;
                 }
 
@@ -110,8 +117,8 @@ namespace JobsScraper.BLL.Services.Djinni
 
                 if (company == null)
                 {
-                    var message = $"Can't parse company name from {nameof(JobBoards.Djinni)}, XPath is";
-                    Console.WriteLine(message);
+                    var message = $"Can't parse company name from {nameof(JobBoards.Djinni)}, XPath is {configuration["Djinni:XPaths:Company"]}";
+                    this.logger.LogError(message);
                     continue;
                 }
 
@@ -133,10 +140,10 @@ namespace JobsScraper.BLL.Services.Djinni
 
                     Location = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Location"])?.InnerText
                         .Replace("\n", string.Empty)
-                        .Replace(" ", string.Empty)
+                        //.Replace(" ", string.Empty)
                         .Trim(),
 
-                    Description = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Description"])?.Attributes["data-truncated-text"]?.Value
+                    Description = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Description"])?.ChildNodes[1]?.InnerText
                         .Replace("\n", string.Empty)
                         .Replace("\r", string.Empty)
                         .Replace("\t", string.Empty)
@@ -151,6 +158,7 @@ namespace JobsScraper.BLL.Services.Djinni
             return vacancies;
         }
 
+#pragma warning disable SA1204 // StaticElementsMustAppearBeforeInstanceElements
         private static int? GetNumberOfPages(HtmlNode document, IConfiguration configuration)
         {
             int? numberOfPages = null;
@@ -168,7 +176,7 @@ namespace JobsScraper.BLL.Services.Djinni
             return numberOfPages;
         }
 
-        private static async Task<IEnumerable<string>> LoadAdditionalPagesAsync(HttpClient httpClient, string requstPath, int numberOfPages, CancellationToken token)
+        private async Task<IEnumerable<string>> LoadAdditionalPagesAsync(HttpClient httpClient, string requstPath, int numberOfPages, CancellationToken token)
         {
             List<Task<string>> pagesTasks = new();
 
@@ -186,8 +194,7 @@ namespace JobsScraper.BLL.Services.Djinni
             }
             catch (HttpRequestException ex)
             {
-                //TODO Log exeption
-                Console.WriteLine(ex.Message);
+                this.logger.LogError(ex, $"Can't load additional pages for {nameof(JobBoards.Djinni)}");
                 return Enumerable.Empty<string>();
             }
 
