@@ -1,4 +1,4 @@
-API for getting vacancies from various sources, now only Djinni scraping implemented.
+API for getting vacancies from various sources, now only Djinni and Dou scraping implemented.
 Technologies:
  - HttpClient
  - HTML Agility Pack
