@@ -35,23 +35,24 @@ namespace JobsScraper.BLL.Services.DOU
         {
             if (jobStacks is JobStacks.CSharpDotNET ||
                 jobStacks is JobStacks.Java ||
-                jobStacks is JobStacks.PHP ||
-                jobStacks is JobStacks.CCppEmbeddedSystem ||
-                jobStacks is JobStacks.ProjectManager ||
-                jobStacks is JobStacks.ProductManager ||
-                jobStacks is JobStacks.HR ||
-                jobStacks is JobStacks.Sales ||
-                jobStacks is JobStacks.BusinessAnalyst ||
-                jobStacks is JobStacks.Python ||
-                jobStacks is JobStacks.Ruby ||
-                jobStacks is JobStacks.Golang ||
-                jobStacks is JobStacks.iOS ||
-                jobStacks is JobStacks.Android ||
                 jobStacks is JobStacks.JavaScriptFrontEnd ||
-                jobStacks is JobStacks.NodeJs ||
-                jobStacks is JobStacks.DesignUIUX ||
-                jobStacks is JobStacks.Marketing ||
-                jobStacks is JobStacks.DevOps)
+                jobStacks is JobStacks.Python
+                //jobStacks is JobStacks.PHP 
+                //jobStacks is JobStacks.CCppEmbeddedSystem ||
+                //jobStacks is JobStacks.ProjectManager ||
+                //jobStacks is JobStacks.ProductManager ||
+                //jobStacks is JobStacks.HR ||
+                //jobStacks is JobStacks.Sales ||
+                //jobStacks is JobStacks.BusinessAnalyst ||
+                //jobStacks is JobStacks.Ruby ||
+                //jobStacks is JobStacks.Golang ||
+                //jobStacks is JobStacks.iOS ||
+                //jobStacks is JobStacks.Android ||
+                //jobStacks is JobStacks.NodeJs ||
+                //jobStacks is JobStacks.DesignUIUX ||
+                //jobStacks is JobStacks.Marketing ||
+                //jobStacks is JobStacks.DevOps
+                )
             {
                 sb.Append("?category=");
             }

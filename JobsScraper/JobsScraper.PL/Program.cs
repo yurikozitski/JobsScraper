@@ -1,10 +1,14 @@
+using FluentValidation;
 using JobsScraper.BLL.Interfaces;
 using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Interfaces.DOU;
+using JobsScraper.BLL.Models;
 using JobsScraper.BLL.Services;
 using JobsScraper.BLL.Services.Djinni;
 using JobsScraper.BLL.Services.DOU;
+using JobsScraper.BLL.Validation;
 using JobsScraper.PL.Middleware;
+using Microsoft.AspNetCore.Mvc;
 using NLog;
 using NLog.Web;
 
@@ -31,6 +35,8 @@ try
     builder.Services.AddScoped<IVacancyService, VacancyService>();
 
     builder.Services.AddHttpClient();
+    builder.Services.AddScoped<IValidator<JobSearchModel>, JobSearchModelValidator>();
+    ValidatorOptions.Global.LanguageManager.Enabled = false;
 
     builder.Configuration.AddJsonFile("parsingconfig.json");
 
@@ -38,6 +44,10 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
+    //builder.Services.Configure<ApiBehaviorOptions>(options =>
+    //{
+    //    options.SuppressModelStateInvalidFilter = true;
+    //});
     builder.Logging.ClearProviders();
     builder.Host.UseNLog();
 
