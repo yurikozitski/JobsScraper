@@ -4,5 +4,6 @@
     {
         Djinni = 1,
         Dou,
+        RobotaUa,
     }
 }

@@ -6,22 +6,27 @@ namespace JobsScraper.BLL.Enums
     {
         [DjinniParam("JavaScript")]
         [DouParam("Front End")]
+        [RobotaUaParam("Front End")]
         JavaScriptFrontEnd = 1,
 
         [DjinniParam("Fullstack")]
         [DouParam("Full Stack")]
+        [RobotaUaParam("Full Stack")]
         Fullstack,
 
         [DjinniParam("Java")]
         [DouParam("Java")]
+        [RobotaUaParam("Java")]
         Java,
 
         [DjinniParam(".NET")]
         [DouParam(".NET")]
+        [RobotaUaParam(".NET")]
         CSharpDotNET,
 
         [DjinniParam("Python")]
         [DouParam("Python")]
+        [RobotaUaParam("Python")]
         Python,
 
         //PHP,

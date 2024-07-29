@@ -26,6 +26,11 @@ namespace JobsScraper.BLL.Extensions
                     jobBoardTypeAttribute = typeof(DouParamAttribute);
                 }
 
+                if (jobBoard is JobBoards.RobotaUa)
+                {
+                    jobBoardTypeAttribute = typeof(RobotaUaParamAttribute);
+                }
+
                 object[] attrs = memInfo[0].GetCustomAttributes(jobBoardTypeAttribute, false);
 
                 if (attrs != null && attrs.Length > 0)
