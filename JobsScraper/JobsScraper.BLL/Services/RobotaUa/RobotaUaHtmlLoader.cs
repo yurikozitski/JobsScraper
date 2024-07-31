@@ -1,45 +1,25 @@
-﻿using JobsScraper.BLL.Interfaces.Djinni;
-using JobsScraper.BLL.Interfaces.RobotaUa;
-using JobsScraper.BLL.Models;
-using JobsScraper.BLL.Services.Djinni;
-using Microsoft.Extensions.Logging;
+﻿using JobsScraper.BLL.Interfaces.RobotaUa;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 
 namespace JobsScraper.BLL.Services.RobotaUa
 {
     public class RobotaUaHtmlLoader : IRobotaUaHtmlLoader
     {
-        private readonly IRobotaUaRequestStringBuilder robotaUaRequestStringBuilder;
-        private readonly IHttpClientFactory httpClientFactory;
-        private readonly ILogger<RobotaUaHtmlLoader> logger;
-
-        public RobotaUaHtmlLoader(
-            IRobotaUaRequestStringBuilder robotaUaRequestStringBuilder,
-            IHttpClientFactory httpClientFactory,
-            ILogger<RobotaUaHtmlLoader> logger)
+        public async Task<string?> LoadJobBoardHTMLAsync(string requestString, CancellationToken token)
         {
-            this.robotaUaRequestStringBuilder = robotaUaRequestStringBuilder;
-            this.httpClientFactory = httpClientFactory;
-            this.logger = logger;
-        }
+            var options = new ChromeOptions();
+            options.AddArguments("headless");
+            options.AddArguments("window-size=800,10000");
 
-        public async Task<string?> LoadJobBoardHTMLAsync(JobSearchModel jobSearchModel, CancellationToken token)
-        {
-            string requestString = this.robotaUaRequestStringBuilder.GetRequestString(jobSearchModel);
+            IWebDriver driver = new ChromeDriver(options);
 
-            var httpClient = this.httpClientFactory.CreateClient();
+            await driver.Navigate().GoToUrlAsync(requestString);
 
-            string? djinniHtml = null;
+            string? robotaUaHtml = driver.PageSource;
+            driver.Quit();
 
-            try
-            {
-                djinniHtml = await httpClient.GetStringAsync(requestString, token);
-            }
-            catch (HttpRequestException ex)
-            {
-                this.logger.LogError(ex, "Unable to load page from robota.ua");
-            }
-
-            return djinniHtml;
+            return robotaUaHtml;
         }
     }
 }

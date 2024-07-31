@@ -27,6 +27,7 @@ namespace JobsScraper.PL.Controllers
         public async Task<ActionResult<IEnumerable<Vacancy>>> GetJobs([FromQuery] JobSearchModel jobSearchModel, CancellationToken token)
         {
             var validationResult = await validator.ValidateAsync(jobSearchModel);
+
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.Errors);
 

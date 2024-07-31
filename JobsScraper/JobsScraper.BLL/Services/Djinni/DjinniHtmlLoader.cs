@@ -6,24 +6,19 @@ namespace JobsScraper.BLL.Services.Djinni
 {
     public class DjinniHtmlLoader : IDjinniHtmlLoader
     {
-        private readonly IDjinniRequestStringBuilder djinniRequestStringBuilder;
         private readonly IHttpClientFactory httpClientFactory;
         private readonly ILogger<DjinniHtmlLoader> logger;
 
         public DjinniHtmlLoader(
-            IDjinniRequestStringBuilder djinniRequestStringBuilder,
             IHttpClientFactory httpClientFactory,
             ILogger<DjinniHtmlLoader> logger)
         {
-            this.djinniRequestStringBuilder = djinniRequestStringBuilder;
             this.httpClientFactory = httpClientFactory;
             this.logger = logger;
         }
 
-        public async Task<string?> LoadJobBoardHTMLAsync(JobSearchModel jobSearchModel, CancellationToken token)
+        public async Task<string?> LoadJobBoardHTMLAsync(string requestString, CancellationToken token)
         {
-            string requestString = this.djinniRequestStringBuilder.GetRequestString(jobSearchModel);
-
             var httpClient = this.httpClientFactory.CreateClient();
 
             string? djinniHtml = null;

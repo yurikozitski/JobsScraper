@@ -1,9 +1,6 @@
-﻿using JobsScraper.BLL.Models;
-
-namespace JobsScraper.BLL.Interfaces.Djinni
+﻿namespace JobsScraper.BLL.Interfaces.Djinni
 {
-    public interface IDjinniVacancyService
+    public interface IDjinniVacancyService : IVacancyService
     {
-        Task<IEnumerable<Vacancy>> GetDjinniVacanciesAsync(JobSearchModel jobSearchModel, CancellationToken token);
     }
 }

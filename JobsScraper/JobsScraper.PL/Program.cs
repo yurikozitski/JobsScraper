@@ -2,10 +2,12 @@ using FluentValidation;
 using JobsScraper.BLL.Interfaces;
 using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Interfaces.DOU;
+using JobsScraper.BLL.Interfaces.RobotaUa;
 using JobsScraper.BLL.Models;
 using JobsScraper.BLL.Services;
 using JobsScraper.BLL.Services.Djinni;
 using JobsScraper.BLL.Services.DOU;
+using JobsScraper.BLL.Services.RobotaUa;
 using JobsScraper.BLL.Validation;
 using JobsScraper.PL.Middleware;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +33,11 @@ try
     builder.Services.AddScoped<IDouHtmlParser, DouHtmlParser>();
     builder.Services.AddScoped<IDouRequestStringBuilder, DouRequestStringBuilder>();
     builder.Services.AddScoped<IDouVacancyService, DouVacancyService>();
+
+    builder.Services.AddScoped<IRobotaUaHtmlLoader, RobotaUaHtmlLoader>();
+    builder.Services.AddScoped<IRobotaUaHtmlParser, RobotaUaHtmlParser>();
+    builder.Services.AddScoped<IRobotaUaRequestStringBuilder, RobotaUaRequestStringBuilder>();
+    builder.Services.AddScoped<IRobotaUaVacancyService, RobotaUaVacancyService>();
 
     builder.Services.AddScoped<IVacancyService, VacancyService>();
 

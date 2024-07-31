@@ -8,21 +8,17 @@ namespace JobsScraper.BLL.Services.DOU
 {
     public class DouHtmlLoader : IDouHtmlLoader
     {
-        private readonly IDouRequestStringBuilder douRequestStringBuilder;
         private readonly IConfiguration configuration;
 
-        public DouHtmlLoader(IDouRequestStringBuilder douRequestStringBuilder, IConfiguration configuration)
+        public DouHtmlLoader(IConfiguration configuration)
         {
-            this.douRequestStringBuilder = douRequestStringBuilder;
             this.configuration = configuration;
         }
 
-        public Task<string?> LoadJobBoardHTMLAsync(JobSearchModel jobSearchModel, CancellationToken token)
+        public Task<string?> LoadJobBoardHTMLAsync(string requestString, CancellationToken token)
         {
             return Task.Run(() =>
             {
-                string requestString = this.douRequestStringBuilder.GetRequestString(jobSearchModel);
-
                 var options = new ChromeOptions();
                 options.AddArguments(new List<string>() { "headless", "disable-gpu" });
                 IWebDriver driver = new ChromeDriver(options);

@@ -13,18 +13,18 @@ namespace JobsScraper.BLL.Services.Djinni
         private const string WebSiteName = "Djinni";
 
         private readonly IDjinniRequestStringBuilder djinniRequestStringBuilder;
-        private readonly IHttpClientFactory httpClientFactory;
+        private readonly IDjinniHtmlLoader djinniHtmlLoader;
         private readonly IConfiguration configuration;
         private readonly ILogger<DjinniHtmlParser> logger;
 
         public DjinniHtmlParser(
             IDjinniRequestStringBuilder djinniRequestStringBuilder,
-            IHttpClientFactory httpClientFactory,
+            IDjinniHtmlLoader djinniHtmlLoader,
             IConfiguration configuration,
             ILogger<DjinniHtmlParser> logger)
         {
             this.djinniRequestStringBuilder = djinniRequestStringBuilder;
-            this.httpClientFactory = httpClientFactory;
+            this.djinniHtmlLoader = djinniHtmlLoader;
             this.configuration = configuration;
             this.logger = logger;
         }
@@ -58,7 +58,7 @@ namespace JobsScraper.BLL.Services.Djinni
                 if (numberOfAdditionalPages != null)
                 {
                     var additionalPages = await this.LoadAdditionalPagesAsync(
-                        this.httpClientFactory.CreateClient(),
+                        this.djinniHtmlLoader,
                         this.djinniRequestStringBuilder.RequestString,
                         (int)numberOfAdditionalPages,
                         token);
@@ -176,14 +176,14 @@ namespace JobsScraper.BLL.Services.Djinni
             return numberOfPages;
         }
 
-        private async Task<IEnumerable<string>> LoadAdditionalPagesAsync(HttpClient httpClient, string requstPath, int numberOfPages, CancellationToken token)
+        private async Task<IEnumerable<string>> LoadAdditionalPagesAsync(IDjinniHtmlLoader djinniHtmlLoader, string requstPath, int numberOfPages, CancellationToken token)
         {
             List<Task<string>> pagesTasks = new();
 
             for (int page = 2; page <= numberOfPages; page++)
             {
-                var pageTask = httpClient.GetStringAsync(requstPath + $"&page={page}", token);
-                pagesTasks.Add(pageTask);
+                var pageTask = djinniHtmlLoader.LoadJobBoardHTMLAsync(requstPath + $"&page={page}", token);
+                pagesTasks.Add(pageTask!);
             }
 
             string[] pages;

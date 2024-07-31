@@ -1,9 +1,6 @@
-﻿using JobsScraper.BLL.Models;
-
-namespace JobsScraper.BLL.Interfaces.DOU
+﻿namespace JobsScraper.BLL.Interfaces.DOU
 {
-    public interface IDouVacancyService
+    public interface IDouVacancyService : IVacancyService
     {
-        Task<IEnumerable<Vacancy>> GetDouVacanciesAsync(JobSearchModel jobSearchModel, CancellationToken token);
     }
 }
