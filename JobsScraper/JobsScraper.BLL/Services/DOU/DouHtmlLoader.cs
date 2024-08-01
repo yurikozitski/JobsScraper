@@ -20,7 +20,9 @@ namespace JobsScraper.BLL.Services.DOU
             return Task.Run(() =>
             {
                 var options = new ChromeOptions();
-                options.AddArguments(new List<string>() { "headless", "disable-gpu" });
+                options.AddArgument("--no-sandbox");
+                options.AddArgument("--headless");
+                options.AddArgument("--disable-dev-shm-usage");
                 IWebDriver driver = new ChromeDriver(options);
 
                 driver.Navigate().GoToUrl(requestString);

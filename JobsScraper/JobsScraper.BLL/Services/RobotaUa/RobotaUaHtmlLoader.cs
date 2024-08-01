@@ -9,7 +9,9 @@ namespace JobsScraper.BLL.Services.RobotaUa
         public async Task<string?> LoadJobBoardHTMLAsync(string requestString, CancellationToken token)
         {
             var options = new ChromeOptions();
-            options.AddArguments("headless");
+            options.AddArgument("--no-sandbox");
+            options.AddArgument("--headless");
+            options.AddArgument("--disable-dev-shm-usage");
             options.AddArguments("window-size=800,10000");
 
             IWebDriver driver = new ChromeDriver(options);

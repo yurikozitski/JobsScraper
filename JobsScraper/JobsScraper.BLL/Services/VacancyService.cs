@@ -25,7 +25,7 @@ namespace JobsScraper.BLL.Services
         public async Task<IEnumerable<Vacancy>> GetVacanciesAsync(JobSearchModel jobSearchModel, CancellationToken token)
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-            cts.CancelAfter(TimeSpan.FromMilliseconds(20_000));
+            cts.CancelAfter(TimeSpan.FromMilliseconds(60_000));
 
             List<Vacancy> vacancies = new();
 
@@ -34,9 +34,9 @@ namespace JobsScraper.BLL.Services
             var robotaUaVacanciesTask = this.robotaUaVacancyService.GetVacanciesAsync(jobSearchModel, cts.Token);
 
             await Task.WhenAll(
-                djinniVacanciesTask,
                 douVacanciesTask,
-                robotaUaVacanciesTask);
+                robotaUaVacanciesTask,
+                djinniVacanciesTask);
 
             vacancies.AddRange(djinniVacanciesTask.Result);
             vacancies.AddRange(douVacanciesTask.Result);

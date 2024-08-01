@@ -69,9 +69,9 @@ try
 
     app.UseMiddleware<ErrorHandlingMiddleware>();
 
-    app.UseHttpsRedirection();
+    //app.UseHttpsRedirection();
 
-    app.UseAuthorization();
+    //app.UseAuthorization();
 
     app.MapControllers();
 
