@@ -15,11 +15,18 @@ namespace JobsScraper.BLL.Services.RobotaUa
             options.AddArguments("window-size=800,10000");
 
             IWebDriver driver = new ChromeDriver(options);
+            string? robotaUaHtml;
 
-            await driver.Navigate().GoToUrlAsync(requestString);
-
-            string? robotaUaHtml = driver.PageSource;
-            driver.Quit();
+            try
+            {
+                await driver.Navigate().GoToUrlAsync(requestString);
+                robotaUaHtml = driver.PageSource;
+            }
+            finally
+            {
+                driver.Close();
+                driver.Quit();
+            }
 
             return robotaUaHtml;
         }

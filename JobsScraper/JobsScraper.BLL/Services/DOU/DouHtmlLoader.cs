@@ -23,39 +23,48 @@ namespace JobsScraper.BLL.Services.DOU
                 options.AddArgument("--no-sandbox");
                 options.AddArgument("--headless");
                 options.AddArgument("--disable-dev-shm-usage");
+
                 IWebDriver driver = new ChromeDriver(options);
+                string? douHtml;
 
-                driver.Navigate().GoToUrl(requestString);
-
-                while (true)
+                try
                 {
-                    if (token.IsCancellationRequested)
+                    driver.Navigate().GoToUrl(requestString);
+
+                    while (true)
                     {
-                        driver.Quit();
-                        token.ThrowIfCancellationRequested();
+                        if (token.IsCancellationRequested)
+                        {
+                            driver.Quit();
+                            token.ThrowIfCancellationRequested();
+                        }
+
+                        IWebElement? loadMoreButton;
+
+                        try
+                        {
+                            loadMoreButton = driver.FindElement(By.CssSelector(this.configuration["DOU:XPaths:LoadMoreButton"])).FindElement(By.TagName("a"));
+                        }
+                        catch (NoSuchElementException)
+                        {
+                            break;
+                        }
+
+                        if (loadMoreButton == null || !loadMoreButton.Displayed)
+                        {
+                            break;
+                        }
+
+                        loadMoreButton.Click();
                     }
 
-                    IWebElement? loadMoreButton;
-
-                    try
-                    {
-                        loadMoreButton = driver.FindElement(By.CssSelector(this.configuration["DOU:XPaths:LoadMoreButton"])).FindElement(By.TagName("a"));
-                    }
-                    catch (NoSuchElementException)
-                    {
-                        break;
-                    }
-
-                    if (loadMoreButton == null || !loadMoreButton.Displayed)
-                    {
-                        break;
-                    }
-
-                    loadMoreButton.Click();
+                    douHtml = driver.PageSource ?? null;
                 }
-
-                string? douHtml = driver.PageSource ?? null;
-                driver.Quit();
+                finally
+                {
+                    driver.Close();
+                    driver.Quit();
+                }
 
                 return douHtml;
             });
