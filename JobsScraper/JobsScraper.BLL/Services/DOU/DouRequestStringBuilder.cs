@@ -10,6 +10,8 @@ namespace JobsScraper.BLL.Services.DOU
     public class DouRequestStringBuilder : IDouRequestStringBuilder
     {
         private readonly IConfiguration configuration;
+        private bool hasSearch;
+        private bool hasQueryParams;
 
         public DouRequestStringBuilder(IConfiguration configuration)
         {
@@ -18,21 +20,25 @@ namespace JobsScraper.BLL.Services.DOU
 
         public string GetRequestString(JobSearchModel jobSearchModel)
         {
+            ArgumentNullException.ThrowIfNull(jobSearchModel);
+
             StringBuilder requestStringBuilder = new StringBuilder(this.configuration["DOU:Domain"]);
 
-            AddJobStackPath(requestStringBuilder, jobSearchModel.JobStack);
-            AddJobTypesPath(requestStringBuilder, jobSearchModel.JobType);
-            AddCountryPath(requestStringBuilder, jobSearchModel.Country);
-            AddCityPath(requestStringBuilder, jobSearchModel.City);
-            AddExperienceLevelPath(requestStringBuilder, jobSearchModel.ExperienceLevel);
-            AddGradePath(requestStringBuilder, jobSearchModel.Grade);
+            this.AddJobTypesPath(requestStringBuilder, jobSearchModel.JobType);
+            this.AddCityPath(requestStringBuilder, jobSearchModel.City);
+            this.AddExperienceLevelPath(requestStringBuilder, jobSearchModel.ExperienceLevel);
+            this.AddJobStackPath(requestStringBuilder, jobSearchModel.JobStack);
+            this.AddCountryPath(requestStringBuilder, jobSearchModel.Country);
+            this.AddGradePath(requestStringBuilder, jobSearchModel.Grade);
 
             string requestString = requestStringBuilder.ToString();
             return requestString;
         }
 
-        private static void AddJobStackPath(StringBuilder sb, JobStacks jobStacks)
+        private void AddJobStackPath(StringBuilder sb, JobStacks jobStacks)
         {
+            string prefix = this.hasQueryParams ? "&" : "?";
+
             if (jobStacks is JobStacks.CSharpDotNET ||
                 jobStacks is JobStacks.Java ||
                 jobStacks is JobStacks.JavaScriptFrontEnd ||
@@ -54,142 +60,192 @@ namespace JobsScraper.BLL.Services.DOU
                 //jobStacks is JobStacks.DevOps
                 )
             {
-                sb.Append("?category=");
+                sb.Append($"{prefix}category=");
+                this.hasQueryParams = true;
             }
             else
             {
-                sb.Append("?search=");
+                sb.Append($"{prefix}search=");
+                this.hasQueryParams = true;
+                this.hasSearch = true;
             }
 
             sb.Append(jobStacks.ToQueryParam(JobBoards.Dou));
         }
 
-        private static void AddJobTypesPath(StringBuilder sb, JobTypes? jobTypes)
+        private void AddJobTypesPath(StringBuilder sb, JobTypes? jobTypes)
         {
             if (jobTypes != null)
             {
                 if (((JobTypes)jobTypes).HasFlag(JobTypes.Remote))
-                    sb.Append("&remote");
+                {
+                    sb.Append("?remote");
+                    this.hasQueryParams = true;
+                }
             }
         }
 
-        private static void AddCountryPath(StringBuilder sb, Countries? countries)
+        private void AddCountryPath(StringBuilder sb, Countries? countries)
         {
             if (countries != null)
             {
+                string prefix = string.Empty;
+
+                if (this.hasSearch && this.hasQueryParams)
+                {
+                    prefix = "+";
+                }
+
+                if (!this.hasSearch && this.hasQueryParams)
+                {
+                    prefix = "&search=";
+                    this.hasSearch = true;
+                }
+
+                if (!this.hasSearch && !this.hasQueryParams)
+                {
+                    prefix = "?search=";
+                    this.hasQueryParams = true;
+                }
+
                 if (((Countries)countries).HasFlag(Countries.Ukraine))
-                    sb.Append("&search=Україна");
+                    sb.Append($"{prefix}Україна");
 
                 if (((Countries)countries).HasFlag(Countries.Poland))
-                    sb.Append("&search=Польща");
+                    sb.Append($"{prefix}Польща");
 
                 if (((Countries)countries).HasFlag(Countries.EU))
-                    sb.Append("&search=Європа");
+                    sb.Append($"{prefix}Європа");
 
                 if (((Countries)countries).HasFlag(Countries.Other))
-                    sb.Append("&search=інші+країни");
+                    sb.Append($"{prefix}інші+країни");
             }
         }
 
-        private static void AddCityPath(StringBuilder sb, Cities? cities)
+        private void AddCityPath(StringBuilder sb, Cities? cities)
         {
             if (cities != null)
             {
+                string prefix = this.hasQueryParams ? "&" : "?";
+
                 if (((Cities)cities).HasFlag(Cities.Kyiv))
-                    sb.Append("&city=Київ");
+                    sb.Append($"{prefix}city=Київ");
 
                 if (((Cities)cities).HasFlag(Cities.Vinnytsia))
-                    sb.Append("&city=Вінниця");
+                    sb.Append($"{prefix}city=Вінниця");
 
                 if (((Cities)cities).HasFlag(Cities.Dnipro))
-                    sb.Append("&city=Дніпро");
+                    sb.Append($"{prefix}city=Дніпро");
 
                 if (((Cities)cities).HasFlag(Cities.IvanoFrankivsk))
-                    sb.Append("&city=Івано-Франківськ");
+                    sb.Append($"{prefix}city=Івано-Франківськ");
 
                 if (((Cities)cities).HasFlag(Cities.Zhytomyr))
-                    sb.Append("&city=Житомир");
+                    sb.Append($"{prefix}city=Житомир");
 
                 if (((Cities)cities).HasFlag(Cities.Zaporizhzhia))
-                    sb.Append("&city=Запоріжжя");
+                    sb.Append($"{prefix}city=Запоріжжя");
 
                 if (((Cities)cities).HasFlag(Cities.Lviv))
-                    sb.Append("&city=Львів");
+                    sb.Append($"{prefix}city=Львів");
 
                 if (((Cities)cities).HasFlag(Cities.Mykolaiv))
-                    sb.Append("&city=Миколаїв");
+                    sb.Append($"{prefix}city=Миколаїв");
 
                 if (((Cities)cities).HasFlag(Cities.Odesa))
-                    sb.Append("&city=Одеса");
+                    sb.Append($"{prefix}city=Одеса");
 
                 if (((Cities)cities).HasFlag(Cities.Ternopil))
-                    sb.Append("&city=Тернопіль");
+                    sb.Append($"{prefix}city=Тернопіль");
 
                 if (((Cities)cities).HasFlag(Cities.Kharkiv))
-                    sb.Append("&city=Харків");
+                    sb.Append($"{prefix}city=Харків");
 
                 if (((Cities)cities).HasFlag(Cities.Khmelnytskyi))
-                    sb.Append("&city=Хмельницький");
+                    sb.Append($"{prefix}city=Хмельницький");
 
                 if (((Cities)cities).HasFlag(Cities.Cherkasy))
-                    sb.Append("&city=Черкаси");
+                    sb.Append($"{prefix}city=Черкаси");
 
                 if (((Cities)cities).HasFlag(Cities.Chernihiv))
-                    sb.Append("&city=Чернігів");
+                    sb.Append($"{prefix}city=Чернігів");
 
                 if (((Cities)cities).HasFlag(Cities.Chernivtsi))
-                    sb.Append("&city=Чернівці");
+                    sb.Append($"{prefix}city=Чернівці");
 
                 if (((Cities)cities).HasFlag(Cities.Uzhhorod))
-                    sb.Append("&city=Ужгород");
+                    sb.Append($"{prefix}city=Ужгород");
+
+                this.hasQueryParams = true;
             }
         }
 
-        private static void AddExperienceLevelPath(StringBuilder sb, ExperienceLevels? experienceLevels)
+        private void AddExperienceLevelPath(StringBuilder sb, ExperienceLevels? experienceLevels)
         {
             if (experienceLevels != null)
             {
+                string prefix = this.hasQueryParams ? "&" : "?";
+
                 if (((ExperienceLevels)experienceLevels).HasFlag(ExperienceLevels.NoExperience))
-                    sb.Append("&exp=0-1");
+                    sb.Append($"{prefix}exp=0-1");
 
                 if (((ExperienceLevels)experienceLevels).HasFlag(ExperienceLevels.OneYear))
-                    sb.Append("&exp=1-3");
+                    sb.Append($"{prefix}exp=1-3");
 
                 if (((ExperienceLevels)experienceLevels).HasFlag(ExperienceLevels.TwoYears))
-                    sb.Append("&exp=1-3");
+                    sb.Append($"{prefix}exp=1-3");
 
                 if (((ExperienceLevels)experienceLevels).HasFlag(ExperienceLevels.ThreeYears))
-                    sb.Append("&exp=3-5");
+                    sb.Append($"{prefix}exp=3-5");
 
                 if (((ExperienceLevels)experienceLevels).HasFlag(ExperienceLevels.FourYear))
-                    sb.Append("&exp=3-5");
+                    sb.Append($"{prefix}exp=3-5");
 
                 if (((ExperienceLevels)experienceLevels).HasFlag(ExperienceLevels.FiveYearsAndAbove))
-                    sb.Append("&exp=5plus");
+                    sb.Append($"{prefix}exp=5plus");
+
+                this.hasQueryParams = true;
             }
         }
 
-        private static void AddGradePath(StringBuilder sb, Grades? grades)
+        private void AddGradePath(StringBuilder sb, Grades? grades)
         {
             if (grades != null)
             {
+                string prefix = string.Empty;
+
+                if (this.hasSearch && this.hasQueryParams)
+                {
+                    prefix = "+";
+                }
+
+                if (!this.hasSearch && this.hasQueryParams)
+                {
+                    prefix = "&search=";
+                }
+
+                if (!this.hasSearch && !this.hasQueryParams)
+                {
+                    prefix = "?search=";
+                }
+
                 if (((Grades)grades).HasFlag(Grades.TraineeIntern))
-                    sb.Append("search=Trainee");
+                    sb.Append($"{prefix}Trainee");
 
                 if (((Grades)grades).HasFlag(Grades.Junior))
-                    sb.Append("&search=Junior");
+                    sb.Append($"{prefix}Junior");
 
                 if (((Grades)grades).HasFlag(Grades.Middle))
-                    sb.Append("&search=Middle");
+                    sb.Append($"{prefix}Middle");
 
                 if (((Grades)grades).HasFlag(Grades.Senior))
-                    sb.Append("&search=Senior");
+                    sb.Append($"{prefix}Senior");
 
                 if (((Grades)grades).HasFlag(Grades.TeamLead))
-                    sb.Append("&search=Team Lead");
+                    sb.Append($"{prefix}Team Lead");
 
                 if (((Grades)grades).HasFlag(Grades.HeadChief))
-                    sb.Append("&search=Chief Head");
+                    sb.Append($"{prefix}Chief Head");
             }
         }
     }

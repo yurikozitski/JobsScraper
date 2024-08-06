@@ -20,6 +20,8 @@ namespace JobsScraper.BLL.Services.Djinni
 
         public string GetRequestString(JobSearchModel jobSearchModel)
         {
+            ArgumentNullException.ThrowIfNull(jobSearchModel);
+
             StringBuilder requestStringBuilder = new StringBuilder(this.configuration["Djinni:Domain"]);
 
             AddJobStackPath(requestStringBuilder, jobSearchModel.JobStack);

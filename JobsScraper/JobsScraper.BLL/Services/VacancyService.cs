@@ -34,9 +34,9 @@ namespace JobsScraper.BLL.Services
             var robotaUaVacanciesTask = this.robotaUaVacancyService.GetVacanciesAsync(jobSearchModel, cts.Token);
 
             await Task.WhenAll(
+                djinniVacanciesTask,
                 douVacanciesTask,
-                robotaUaVacanciesTask,
-                djinniVacanciesTask);
+                robotaUaVacanciesTask);
 
             vacancies.AddRange(djinniVacanciesTask.Result);
             vacancies.AddRange(douVacanciesTask.Result);
