@@ -11,7 +11,7 @@ namespace JobsScraper.BLL.Enums
 
         [DjinniParam("Fullstack")]
         [DouParam("Full Stack")]
-        [RobotaUaParam("Full Stack")]
+        [RobotaUaParam("Full-Stack")]
         Fullstack,
 
         [DjinniParam("Java")]

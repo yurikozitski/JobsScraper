@@ -21,6 +21,8 @@ namespace JobsScraper.BLL.Services.RobotaUa
 
         public string GetRequestString(JobSearchModel jobSearchModel)
         {
+            ArgumentNullException.ThrowIfNull(jobSearchModel);
+
             StringBuilder requestStringBuilder = new StringBuilder(this.configuration["RobotaUa:Domain"]);
 
             AddJobStackPath(requestStringBuilder, jobSearchModel.JobStack);
@@ -137,13 +139,15 @@ namespace JobsScraper.BLL.Services.RobotaUa
         {
             if (experienceLevels != null)
             {
-                if (hasQueryParams)
-                    sb.Append("&");
-                else
-                    sb.Append("?");
-
                 if (((ExperienceLevels)experienceLevels).HasFlag(ExperienceLevels.NoExperience))
+                {
+                    if (hasQueryParams)
+                        sb.Append("&");
+                    else
+                        sb.Append("?");
+
                     sb.Append("experienceType=true");
+                }
             }
         }
 

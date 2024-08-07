@@ -27,10 +27,10 @@ namespace JobsScraper.Tests.DOU
             var douRequestStringBuilder = new DouRequestStringBuilder(configuration);
 
             // Act
-            bool isEqual = string.Equals(douRequestStringBuilder.GetRequestString(jobSearchModel), expected, StringComparison.InvariantCulture);
+            string actual = douRequestStringBuilder.GetRequestString(jobSearchModel);
 
             // Assert
-            Assert.True(isEqual);
+            Assert.True(string.Equals(actual, expected, StringComparison.InvariantCulture));
         }
 
         [Theory]

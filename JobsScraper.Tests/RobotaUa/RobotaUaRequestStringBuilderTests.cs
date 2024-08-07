@@ -1,12 +1,13 @@
 ﻿using JobsScraper.BLL.Enums;
 using JobsScraper.BLL.Models;
-using JobsScraper.BLL.Services.Djinni;
+using JobsScraper.BLL.Services.RobotaUa;
 using Microsoft.Extensions.Configuration;
 
-namespace JobsScraper.Tests.Djinni
+namespace JobsScraper.Tests.RobotaUa
 {
-    public class DjinniRequestStringBuilderTests
+    public class RobotaUaRequestStringBuilderTests
     {
+
 #pragma warning disable S3263 // Static fields should appear in the order they must be initialized 
         private static IConfiguration configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configData!)
@@ -15,7 +16,7 @@ namespace JobsScraper.Tests.Djinni
 
         private static Dictionary<string, string> configData = new Dictionary<string, string>
         {
-            { "Djinni:Domain", "https://djinni.co/jobs/" },
+            { "RobotaUa:Domain", "https://robota.ua/zapros/" },
         };
 
         [Theory]
@@ -23,10 +24,10 @@ namespace JobsScraper.Tests.Djinni
         public void GetRequestString_ValidData_ReturnsRequestString(JobSearchModel jobSearchModel, string expected)
         {
             // Arrange
-            var djinniRequestStringBuilder = new DjinniRequestStringBuilder(configuration);
+            var robotaUaRequestStringBuilder = new RobotaUaRequestStringBuilder(configuration);
 
             // Act
-            string actual = djinniRequestStringBuilder.GetRequestString(jobSearchModel);
+            string actual = robotaUaRequestStringBuilder.GetRequestString(jobSearchModel);
 
             // Assert
             Assert.True(string.Equals(actual, expected, StringComparison.InvariantCulture));
@@ -37,10 +38,10 @@ namespace JobsScraper.Tests.Djinni
         public void GetRequestString_InValidData_ThrowsException(JobSearchModel jobSearchModel)
         {
             // Arrange
-            var djinniRequestStringBuilder = new DjinniRequestStringBuilder(configuration);
+            var robotaUaRequestStringBuilder = new RobotaUaRequestStringBuilder(configuration);
 
             // Act
-            var result = djinniRequestStringBuilder.GetRequestString;
+            var result = robotaUaRequestStringBuilder.GetRequestString;
 
             // Assert
             Assert.ThrowsAny<ArgumentException>(() => result(jobSearchModel));
@@ -55,7 +56,7 @@ namespace JobsScraper.Tests.Djinni
                     {
                         JobStack = JobStacks.CSharpDotNET,
                     },
-                    configuration["Djinni:Domain"]! + "?primary_keyword=.NET",
+                    configuration["RobotaUa:Domain"]! + ".NET/ukraine",
                 },
                 new object[]
                 {
@@ -64,7 +65,16 @@ namespace JobsScraper.Tests.Djinni
                         JobStack = JobStacks.CSharpDotNET,
                         JobType = JobTypes.Remote,
                     },
-                    configuration["Djinni:Domain"]! + "?primary_keyword=.NET&employment=remote",
+                    configuration["RobotaUa:Domain"]! + ".NET/ukraine?scheduleIds=3",
+                },
+                new object[]
+                {
+                    new JobSearchModel()
+                    {
+                        JobStack = JobStacks.Fullstack,
+                        Grade = Grades.Junior,
+                    },
+                    configuration["RobotaUa:Domain"]! + "Full-Stack-junior/ukraine",
                 },
                 new object[]
                 {
@@ -74,7 +84,7 @@ namespace JobsScraper.Tests.Djinni
                         JobType = JobTypes.Remote,
                         Grade = Grades.Junior,
                     },
-                    configuration["Djinni:Domain"]! + "?primary_keyword=.NET&employment=remote&exp_rank=junior",
+                    configuration["RobotaUa:Domain"]! + ".NET-junior/ukraine?scheduleIds=3",
                 },
                 new object[]
                 {
@@ -89,8 +99,24 @@ namespace JobsScraper.Tests.Djinni
                         SalaryFrom = 500,
                         EnglishLevel = EnglishLevels.Intermediate,
                     },
-                    configuration["Djinni:Domain"]! 
-                    + "?primary_keyword=.NET&employment=remote&region=UKR&location=kyiv&exp_level=1y&exp_rank=junior&salary=500&english_level=intermediate",
+                    configuration["RobotaUa:Domain"]!
+                    + ".NET-junior/kyiv?scheduleIds=3&salary=20000",
+                },
+                new object[]
+                {
+                    new JobSearchModel()
+                    {
+                        JobStack = JobStacks.CSharpDotNET,
+                        JobType = JobTypes.Remote,
+                        Country = Countries.Ukraine,
+                        City = Cities.Kyiv,
+                        ExperienceLevel = ExperienceLevels.NoExperience,
+                        Grade = Grades.Junior,
+                        SalaryFrom = 300,
+                        EnglishLevel = EnglishLevels.Intermediate,
+                    },
+                    configuration["RobotaUa:Domain"]!
+                    + ".NET-junior/kyiv?scheduleIds=3&salary=12000&experienceType=true",
                 },
             };
 
