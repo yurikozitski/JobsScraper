@@ -1,6 +1,7 @@
-API for getting vacancies from various sources, now only Djinni and Dou scraping implemented.
+API for getting vacancies from various sources, now Djinni, Dou, Robota.ua scraping implemented.
 Technologies:
  - HttpClient
+ - Selenium
  - HTML Agility Pack
  - ASP.NET Core 8
 
