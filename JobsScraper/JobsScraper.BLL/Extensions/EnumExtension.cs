@@ -31,6 +31,11 @@ namespace JobsScraper.BLL.Extensions
                     jobBoardTypeAttribute = typeof(RobotaUaParamAttribute);
                 }
 
+                if (jobBoard is JobBoards.Recruitika)
+                {
+                    jobBoardTypeAttribute = typeof(RecruitikaParamAttribute);
+                }
+
                 object[] attrs = memInfo[0].GetCustomAttributes(jobBoardTypeAttribute, false);
 
                 if (attrs != null && attrs.Length > 0)

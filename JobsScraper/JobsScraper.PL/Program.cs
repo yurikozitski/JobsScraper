@@ -1,16 +1,10 @@
 using FluentValidation;
+using JobsScraper.BLL.Extensions;
 using JobsScraper.BLL.Interfaces;
-using JobsScraper.BLL.Interfaces.Djinni;
-using JobsScraper.BLL.Interfaces.DOU;
-using JobsScraper.BLL.Interfaces.RobotaUa;
 using JobsScraper.BLL.Models;
 using JobsScraper.BLL.Services;
-using JobsScraper.BLL.Services.Djinni;
-using JobsScraper.BLL.Services.DOU;
-using JobsScraper.BLL.Services.RobotaUa;
 using JobsScraper.BLL.Validation;
 using JobsScraper.PL.Middleware;
-using Microsoft.AspNetCore.Mvc;
 using NLog;
 using NLog.Web;
 
@@ -21,23 +15,11 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     // Add services to the container.
-
     builder.Services.AddControllers();
 
-    builder.Services.AddScoped<IDjinniHtmlLoader, DjinniHtmlLoader>();
-    builder.Services.AddScoped<IDjinniHtmlParser, DjinniHtmlParser>();
-    builder.Services.AddScoped<IDjinniRequestStringBuilder, DjinniRequestStringBuilder>();
-    builder.Services.AddScoped<IDjinniVacancyService, DjinniVacancyService>();
-
-    builder.Services.AddScoped<IDouHtmlLoader, DouHtmlLoader>();
-    builder.Services.AddScoped<IDouHtmlParser, DouHtmlParser>();
-    builder.Services.AddScoped<IDouRequestStringBuilder, DouRequestStringBuilder>();
-    builder.Services.AddScoped<IDouVacancyService, DouVacancyService>();
-
-    builder.Services.AddScoped<IRobotaUaHtmlLoader, RobotaUaHtmlLoader>();
-    builder.Services.AddScoped<IRobotaUaHtmlParser, RobotaUaHtmlParser>();
-    builder.Services.AddScoped<IRobotaUaRequestStringBuilder, RobotaUaRequestStringBuilder>();
-    builder.Services.AddScoped<IRobotaUaVacancyService, RobotaUaVacancyService>();
+    builder.Services.AddDjinniServices();
+    builder.Services.AddDouServices();
+    builder.Services.AddRobotaUaServices();
 
     builder.Services.AddScoped<IVacancyService, VacancyService>();
 

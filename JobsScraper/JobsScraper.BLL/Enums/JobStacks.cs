@@ -7,26 +7,31 @@ namespace JobsScraper.BLL.Enums
         [DjinniParam("JavaScript")]
         [DouParam("Front End")]
         [RobotaUaParam("Front End")]
+        [RecruitikaParam("front-end")]
         JavaScriptFrontEnd = 1,
 
         [DjinniParam("Fullstack")]
         [DouParam("Full Stack")]
         [RobotaUaParam("Full-Stack")]
+        [RecruitikaParam("full-stack")]
         Fullstack,
 
         [DjinniParam("Java")]
         [DouParam("Java")]
         [RobotaUaParam("Java")]
+        [RecruitikaParam("java-developer")]
         Java,
 
         [DjinniParam(".NET")]
         [DouParam(".NET")]
         [RobotaUaParam(".NET")]
+        [RecruitikaParam("net")]
         CSharpDotNET,
 
         [DjinniParam("Python")]
         [DouParam("Python")]
         [RobotaUaParam("Python")]
+        [RecruitikaParam("python")]
         Python,
 
         //PHP,

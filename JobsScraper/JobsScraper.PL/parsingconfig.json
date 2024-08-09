@@ -37,5 +37,18 @@
       "JobTitle": ".//h2",
       "Pagination": "//div[contains(@class, 'paginator')]"
     }
+  },
+  "Recruitika": {
+    "Domain": "https://recruitika.com/",
+    "XPaths": {
+      "LoadMoreButton": "div[class='more-btn']",
+      "VacancyList": "//li[@class = 'l-vacancy']",
+      "LinkTitle": ".//a[@class = 'vt']",
+      "JobTypeLocation": ".//span[@class = 'cities']",
+      "Company": ".//a[@class = 'company']",
+      "PublicationDate": ".//div[@class = 'date']",
+      "Salary": ".//span[@class = 'salary']",
+      "Description": ".//div[@class = 'sh-info']"
+    }
   }
 }
