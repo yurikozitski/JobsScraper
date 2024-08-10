@@ -43,13 +43,13 @@ namespace JobsScraper.BLL.Services.DOU
                     return Enumerable.Empty<Vacancy>();
                 }
 
-                var vacancies = this.GetVacancyList(vacancyNodes, this.configuration, token);
+                var vacancies = this.GetVacancyList(vacancyNodes, token);
 
                 return vacancies;
             });
         }
 
-        private List<Vacancy> GetVacancyList(HtmlNodeCollection vacancyNodes, IConfiguration configuration, CancellationToken token)
+        private List<Vacancy> GetVacancyList(HtmlNodeCollection vacancyNodes, CancellationToken token)
         {
             List<Vacancy> vacancies = new();
 
@@ -57,41 +57,41 @@ namespace JobsScraper.BLL.Services.DOU
             {
                 token.ThrowIfCancellationRequested();
 
-                string? link = vacancyNode.SelectSingleNode(configuration["DOU:XPaths:LinkTitle"])?.Attributes["href"]?.Value
+                string? link = vacancyNode.SelectSingleNode(this.configuration["DOU:XPaths:LinkTitle"])?.Attributes["href"]?.Value
                         .Replace("\n", string.Empty)
                         .Trim()!;
 
                 if (link == null)
                 {
-                    var message = $"Can't parse local link from {nameof(JobBoards.Dou)}, XPath is {configuration["DOU:XPaths:LinkTitle"]}";
+                    var message = $"Can't parse local link from {nameof(JobBoards.Dou)}, XPath is {this.configuration["DOU:XPaths:LinkTitle"]}";
                     this.logger.LogError(message);
                     continue;
                 }
 
-                string jobTitle = vacancyNode.SelectSingleNode(configuration["DOU:XPaths:LinkTitle"])?.InnerText
+                string jobTitle = vacancyNode.SelectSingleNode(this.configuration["DOU:XPaths:LinkTitle"])?.InnerText
                         .Replace("\n", string.Empty)
                         .Trim()!;
 
                 if (jobTitle == null)
                 {
-                    var message = $"Can't parse job title from {nameof(JobBoards.Dou)}, XPath is {configuration["DOU:XPaths:LinkTitle"]}";
+                    var message = $"Can't parse job title from {nameof(JobBoards.Dou)}, XPath is {this.configuration["DOU:XPaths:LinkTitle"]}";
                     this.logger.LogError(message);
                     continue;
                 }
 
-                string company = vacancyNode.SelectSingleNode(configuration["DOU:XPaths:Company"])?.InnerText
+                string company = vacancyNode.SelectSingleNode(this.configuration["DOU:XPaths:Company"])?.InnerText
                         .Replace("&nbsp;", string.Empty)
                         .Replace("\n", string.Empty)
                         .Trim()!;
 
                 if (company == null)
                 {
-                    var message = $"Can't parse company name from {nameof(JobBoards.Dou)}, XPath is {configuration["Dou:XPaths:Company"]}";
+                    var message = $"Can't parse company name from {nameof(JobBoards.Dou)}, XPath is {this.configuration["Dou:XPaths:Company"]}";
                     this.logger.LogError(message);
                     continue;
                 }
 
-                string? publicationDateString = vacancyNode.SelectSingleNode(configuration["DOU:XPaths:PublicationDate"])?.InnerText.Trim();
+                string? publicationDateString = vacancyNode.SelectSingleNode(this.configuration["DOU:XPaths:PublicationDate"])?.InnerText.Trim();
                 DateOnly? publicationDate = null;
 
                 if (publicationDateString != null)
@@ -120,7 +120,7 @@ namespace JobsScraper.BLL.Services.DOU
                 }
 
                 string? location = null;
-                var locationStrings = vacancyNode.SelectSingleNode(configuration["DOU:XPaths:JobTypeLocation"])?.InnerText
+                var locationStrings = vacancyNode.SelectSingleNode(this.configuration["DOU:XPaths:JobTypeLocation"])?.InnerText
                         .Replace("\n", string.Empty)
                         .Split(',')
                         .Select(x => x.Trim())
@@ -138,15 +138,15 @@ namespace JobsScraper.BLL.Services.DOU
                     JobTitle = jobTitle,
                     Company = company,
 
-                    Salary = vacancyNode.SelectSingleNode(configuration["DOU:XPaths:Salary"])?.InnerText
+                    Salary = vacancyNode.SelectSingleNode(this.configuration["DOU:XPaths:Salary"])?.InnerText
                         .Replace("\n", string.Empty)
                         .Trim(),
 
-                    JobType = GetJobType(vacancyNode, configuration),
+                    JobType = this.GetJobType(vacancyNode),
 
                     Location = location,
 
-                    Description = vacancyNode.SelectSingleNode(configuration["DOU:XPaths:Description"])?.InnerText
+                    Description = vacancyNode.SelectSingleNode(this.configuration["DOU:XPaths:Description"])?.InnerText
                         .Replace("&nbsp;", " ")
                         .Replace("\n", string.Empty)
                         .Replace("\r", string.Empty)
@@ -163,13 +163,13 @@ namespace JobsScraper.BLL.Services.DOU
         }
 
 #pragma warning disable SA1204 // StaticElementsMustAppearBeforeInstanceElements
-        private static string? GetJobType(HtmlNode vacancyNode, IConfiguration configuration)
+        private string? GetJobType(HtmlNode vacancyNode)
         {
             string? jobType = null;
 
             if (vacancyNode != null)
             {
-                var jobTypeLocations = vacancyNode.SelectSingleNode(configuration["DOU:XPaths:JobTypeLocation"])?.InnerText
+                var jobTypeLocations = vacancyNode.SelectSingleNode(this.configuration["DOU:XPaths:JobTypeLocation"])?.InnerText
                     .Replace("\n", string.Empty)
                     .Split(',')
                     .Select(x => x.Trim());

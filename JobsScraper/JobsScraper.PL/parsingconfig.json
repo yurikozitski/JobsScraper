@@ -3,15 +3,15 @@
     "Domain": "https://djinni.co/jobs/",
     "ShortDomain": "https://djinni.co",
     "XPaths": {
-      "VacancyList": "//li[@class = 'list-jobs__item job-list__item']",
-      "LocalLink": ".//a[@class = 'h3 job-list-item__link']",
-      "JobTitle": ".//a[@class = 'h3 job-list-item__link']",
-      "JobType": ".//div[@class = 'job-list-item__job-info font-weight-500']",
-      "Company": ".//a[@class = 'mr-2']",
-      "PublicationDate": ".//span[@class = 'mr-2 nobr']",
+      "VacancyList": "//li[contains(@id, 'job-item')]",
+      "LocalLink": ".//a[@class = 'job-item__title-link']",
+      "JobTitle": ".//a[@class = 'job-item__title-link']",
+      "JobType": ".//div[@class = 'fw-medium d-flex flex-wrap align-items-center gap-1']",
+      "Company": ".//a[@class = 'text-body']",
+      "PublicationDate": ".//span[@data-original-title]",
       "Salary": ".//span[@class = 'public-salary-item']",
       "Location": ".//span[@class = 'location-text']",
-      "Description": ".//div[contains(@id, 'job-description')]",
+      "Description": ".//span[contains(@id, 'job-description')]",
       "Pagination": "//ul[@class = 'pagination pagination_with_numbers']"
     }
   },
@@ -40,15 +40,16 @@
   },
   "Recruitika": {
     "Domain": "https://recruitika.com/",
+    "ShortDomain": "https://recruitika.com",
     "XPaths": {
-      "LoadMoreButton": "div[class='more-btn']",
-      "VacancyList": "//li[@class = 'l-vacancy']",
-      "LinkTitle": ".//a[@class = 'vt']",
-      "JobTypeLocation": ".//span[@class = 'cities']",
-      "Company": ".//a[@class = 'company']",
-      "PublicationDate": ".//div[@class = 'date']",
-      "Salary": ".//span[@class = 'salary']",
-      "Description": ".//div[@class = 'sh-info']"
+      "VacancyList": "//div[@class = 'vacancy-row']",
+      "JobTitle": ".//div[@class = 'vacancy-title']",
+      "JobType": ".//ul[@class = 'vacancy-tags-list']",
+      "Company": ".//a[@class = 'vacancy-info__company']",
+      "PublicationDate": ".//div[@class = 'vacancy-col vacancy-col--date']",
+      "Salary": ".//span[@class = 'vacancy-info__salary']",
+      "Location": ".//span[@class = 'vacancy-info__city']",
+      "Pagination": "//div[@class = 'paginate-links-wrapper']"
     }
   }
 }

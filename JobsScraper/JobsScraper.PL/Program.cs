@@ -20,6 +20,7 @@ try
     builder.Services.AddDjinniServices();
     builder.Services.AddDouServices();
     builder.Services.AddRobotaUaServices();
+    builder.Services.AddRecruitikaServices();
 
     builder.Services.AddScoped<IVacancyService, VacancyService>();
 

@@ -1,6 +1,7 @@
 ﻿using JobsScraper.BLL.Interfaces;
 using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Interfaces.DOU;
+using JobsScraper.BLL.Interfaces.Recruitika;
 using JobsScraper.BLL.Interfaces.RobotaUa;
 using JobsScraper.BLL.Models;
 
@@ -11,15 +12,18 @@ namespace JobsScraper.BLL.Services
         private readonly IDouVacancyService douVacancyService;
         private readonly IDjinniVacancyService djinniVacancyService;
         private readonly IRobotaUaVacancyService robotaUaVacancyService;
+        private readonly IRecruitikaVacancyService recruitikaVacancyService;
 
         public VacancyService(
             IDjinniVacancyService djinniVacancyService,
             IDouVacancyService douVacancyService,
-            IRobotaUaVacancyService robotaUaVacancyService)
+            IRobotaUaVacancyService robotaUaVacancyService,
+            IRecruitikaVacancyService recruitikaVacancyService)
         {
             this.djinniVacancyService = djinniVacancyService;
             this.douVacancyService = douVacancyService;
             this.robotaUaVacancyService = robotaUaVacancyService;
+            this.recruitikaVacancyService = recruitikaVacancyService;
         }
 
         public async Task<IEnumerable<Vacancy>> GetVacanciesAsync(JobSearchModel jobSearchModel, CancellationToken token)
@@ -32,15 +36,18 @@ namespace JobsScraper.BLL.Services
             var djinniVacanciesTask = this.djinniVacancyService.GetVacanciesAsync(jobSearchModel, cts.Token);
             var douVacanciesTask = this.douVacancyService.GetVacanciesAsync(jobSearchModel, cts.Token);
             var robotaUaVacanciesTask = this.robotaUaVacancyService.GetVacanciesAsync(jobSearchModel, cts.Token);
+            var recruitikaVacanciesTask = this.recruitikaVacancyService.GetVacanciesAsync(jobSearchModel, cts.Token);
 
             await Task.WhenAll(
                 djinniVacanciesTask,
                 douVacanciesTask,
-                robotaUaVacanciesTask);
+                robotaUaVacanciesTask,
+                recruitikaVacanciesTask);
 
             vacancies.AddRange(djinniVacanciesTask.Result);
             vacancies.AddRange(douVacanciesTask.Result);
             vacancies.AddRange(robotaUaVacanciesTask.Result);
+            vacancies.AddRange(recruitikaVacanciesTask.Result);
 
             return vacancies;
         }

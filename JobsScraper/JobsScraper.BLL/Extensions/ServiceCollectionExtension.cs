@@ -1,8 +1,10 @@
 ﻿using JobsScraper.BLL.Interfaces.Djinni;
 using JobsScraper.BLL.Interfaces.DOU;
+using JobsScraper.BLL.Interfaces.Recruitika;
 using JobsScraper.BLL.Interfaces.RobotaUa;
 using JobsScraper.BLL.Services.Djinni;
 using JobsScraper.BLL.Services.DOU;
+using JobsScraper.BLL.Services.Recruitika;
 using JobsScraper.BLL.Services.RobotaUa;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,6 +34,14 @@ namespace JobsScraper.BLL.Extensions
             services.AddScoped<IRobotaUaHtmlParser, RobotaUaHtmlParser>();
             services.AddScoped<IRobotaUaRequestStringBuilder, RobotaUaRequestStringBuilder>();
             services.AddScoped<IRobotaUaVacancyService, RobotaUaVacancyService>();
+        }
+
+        public static void AddRecruitikaServices(this IServiceCollection services)
+        {
+            services.AddScoped<IRecruitikaHtmlLoader, RecruitikaHtmlLoader>();
+            services.AddScoped<IRecruitikaHtmlParser, RecruitikaHtmlParser>();
+            services.AddScoped<IRecruitikaRequestStringBuilder, RecruitikaRequestStringBuilder>();
+            services.AddScoped<IRecruitikaVacancyService, RecruitikaVacancyService>();
         }
     }
 }

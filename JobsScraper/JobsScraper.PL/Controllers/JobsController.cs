@@ -2,7 +2,6 @@
 using JobsScraper.BLL.Interfaces;
 using JobsScraper.BLL.Models;
 using Microsoft.AspNetCore.Mvc;
-using OpenQA.Selenium.Support.UI;
 
 namespace JobsScraper.PL.Controllers
 {

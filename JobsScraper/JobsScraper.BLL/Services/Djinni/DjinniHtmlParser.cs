@@ -51,9 +51,9 @@ namespace JobsScraper.BLL.Services.Djinni
                     return Enumerable.Empty<Vacancy>();
                 }
 
-                var vacancies = this.GetVacancyList(vacancyNodes, this.configuration, token);
+                var vacancies = this.GetVacancyList(vacancyNodes, token);
 
-                int? numberOfAdditionalPages = GetNumberOfPages(doc.DocumentNode, this.configuration);
+                int? numberOfAdditionalPages = this.GetNumberOfPages(doc.DocumentNode);
 
                 if (numberOfAdditionalPages != null)
                 {
@@ -69,8 +69,7 @@ namespace JobsScraper.BLL.Services.Djinni
                         pageDoc.LoadHtml(page);
 
                         vacancies.AddRange(this.GetVacancyList(
-                            pageDoc.DocumentNode.SelectNodes("//li[@class = 'list-jobs__item job-list__item']"),
-                            this.configuration,
+                            pageDoc.DocumentNode.SelectNodes(this.configuration["Djinni:XPaths:VacancyList"]),
                             token));
                     }
                 }
@@ -79,7 +78,7 @@ namespace JobsScraper.BLL.Services.Djinni
             });
         }
 
-        private List<Vacancy> GetVacancyList(HtmlNodeCollection vacancyNodes, IConfiguration configuration, CancellationToken token)
+        private List<Vacancy> GetVacancyList(HtmlNodeCollection vacancyNodes, CancellationToken token)
         {
             List<Vacancy> vacancies = new();
 
@@ -87,42 +86,42 @@ namespace JobsScraper.BLL.Services.Djinni
             {
                 token.ThrowIfCancellationRequested();
 
-                string? localLink = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:LocalLink"])?.Attributes["href"]?.Value
+                string? localLink = vacancyNode.SelectSingleNode(this.configuration["Djinni:XPaths:LocalLink"])?.Attributes["href"]?.Value
                         .Replace("\n", string.Empty)
                         .Trim()!;
 
                 if (localLink == null)
                 {
-                    var message = $"Can't parse local link from {nameof(JobBoards.Djinni)}, XPath is {configuration["Djinni:XPaths:LocalLink"]}";
+                    var message = $"Can't parse local link from {nameof(JobBoards.Djinni)}, XPath is {this.configuration["Djinni:XPaths:LocalLink"]}";
                     this.logger.LogError(message);
                     continue;
                 }
 
-                string link = configuration["Djinni:ShortDomain"] + localLink;
+                string link = this.configuration["Djinni:ShortDomain"] + localLink;
 
-                string jobTitle = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:JobTitle"])?.InnerText
+                string jobTitle = vacancyNode.SelectSingleNode(this.configuration["Djinni:XPaths:JobTitle"])?.InnerText
                         .Replace("\n", string.Empty)
                         .Trim()!;
 
                 if (jobTitle == null)
                 {
-                    var message = $"Can't parse job title from {nameof(JobBoards.Djinni)}, XPath is {configuration["Djinni:XPaths:JobTitle"]}";
+                    var message = $"Can't parse job title from {nameof(JobBoards.Djinni)}, XPath is {this.configuration["Djinni:XPaths:JobTitle"]}";
                     this.logger.LogError(message);
                     continue;
                 }
 
-                string company = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Company"])?.InnerText
+                string company = vacancyNode.SelectSingleNode(this.configuration["Djinni:XPaths:Company"])?.InnerText
                         .Replace("\n", string.Empty)
                         .Trim()!;
 
                 if (company == null)
                 {
-                    var message = $"Can't parse company name from {nameof(JobBoards.Djinni)}, XPath is {configuration["Djinni:XPaths:Company"]}";
+                    var message = $"Can't parse company name from {nameof(JobBoards.Djinni)}, XPath is {this.configuration["Djinni:XPaths:Company"]}";
                     this.logger.LogError(message);
                     continue;
                 }
 
-                string? publicationDateString = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:PublicationDate"])?.Attributes["title"]?.Value.Trim();
+                string? publicationDateString = vacancyNode.SelectSingleNode(this.configuration["Djinni:XPaths:PublicationDate"])?.Attributes["data-original-title"]?.Value.Trim();
                 DateOnly.TryParse(publicationDateString?.Substring(6), CultureInfo.GetCultureInfo("ru-RU"), out DateOnly publicationDate);
 
                 Vacancy vacancy = new Vacancy()
@@ -132,25 +131,25 @@ namespace JobsScraper.BLL.Services.Djinni
                     JobTitle = jobTitle,
                     Company = company,
 
-                    Salary = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Salary"])?.InnerText
+                    Salary = vacancyNode.SelectSingleNode(this.configuration["Djinni:XPaths:Salary"])?.InnerText
                         .Replace("\n", string.Empty)
                         .Trim(),
 
-                    JobType = GetJobType(vacancyNode, configuration),
+                    JobType = this.GetJobType(vacancyNode),
 
-                    Location = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Location"])?.InnerText
+                    Location = vacancyNode.SelectSingleNode(this.configuration["Djinni:XPaths:Location"])?.InnerText
                         .Replace("\n", string.Empty)
                         //.Replace(" ", string.Empty)
                         .Trim(),
 
-                    Description = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:Description"])?.ChildNodes[1]?.InnerText
+                    Description = vacancyNode.SelectSingleNode(this.configuration["Djinni:XPaths:Description"])?.ChildNodes[1]?.InnerText
                         .Replace("\n", string.Empty)
                         .Replace("\r", string.Empty)
                         .Replace("\t", string.Empty)
                         .Replace("&#39;", "'")
                         .Trim(),
 
-                    PublicationDate = publicationDate,
+                    PublicationDate = publicationDate != default(DateOnly) ? publicationDate : null,
                 };
                 vacancies.Add(vacancy);
             }
@@ -158,11 +157,10 @@ namespace JobsScraper.BLL.Services.Djinni
             return vacancies;
         }
 
-#pragma warning disable SA1204 // StaticElementsMustAppearBeforeInstanceElements
-        private static int? GetNumberOfPages(HtmlNode document, IConfiguration configuration)
+        private int? GetNumberOfPages(HtmlNode document)
         {
             int? numberOfPages = null;
-            var paginationNode = document.SelectSingleNode(configuration["Djinni:XPaths:Pagination"]);
+            var paginationNode = document.SelectSingleNode(this.configuration["Djinni:XPaths:Pagination"]);
 
             if (paginationNode != null &&
                 paginationNode.HasChildNodes &&
@@ -201,31 +199,21 @@ namespace JobsScraper.BLL.Services.Djinni
             return pages.ToList();
         }
 
-        private static string? GetJobType(HtmlNode vacancyNode, IConfiguration configuration)
+        private string? GetJobType(HtmlNode vacancyNode)
         {
             string? jobType = null;
 
             if (vacancyNode != null)
             {
-                var vacancyInfoNodes = vacancyNode.SelectSingleNode(configuration["Djinni:XPaths:JobType"])?.ChildNodes
-                    .Where(node => node.HasClass("nobr"))
-                    .Select(node => node.ChildNodes[1]);
+                var remoteNode = vacancyNode.SelectSingleNode(this.configuration["Djinni:XPaths:JobType"])?.ChildNodes
+                    .FirstOrDefault(node => node.InnerText.Trim() == "Тільки віддалено");
+                if (remoteNode != null)
+                    return "Тільки віддалено";
 
-                if (vacancyInfoNodes != null)
-                {
-                    foreach (var node in vacancyInfoNodes)
-                    {
-                        string? innerText = node?.InnerText?.Trim();
-
-                        if (innerText == "Тільки віддалено" ||
-                            innerText == "Office або Remote" ||
-                            innerText == "Гібридна робота" ||
-                            innerText == "Тільки офіс")
-                        {
-                            jobType = innerText;
-                        }
-                    }
-                }
+                var officeNode = vacancyNode.SelectSingleNode(this.configuration["Djinni:XPaths:JobType"])?.ChildNodes
+                    .FirstOrDefault(node => node.InnerText.Trim() == "Тільки офіс");
+                if (officeNode != null)
+                    return "Тільки офіс";
             }
 
             return jobType;
