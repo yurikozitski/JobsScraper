@@ -39,7 +39,7 @@ namespace JobsScraper.PL.Middleware
                     break;
             }
 
-            context.Response.ContentType = "appliation/json";
+            context.Response.ContentType = "application/json";
 
             if (message != "")
             {

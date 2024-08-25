@@ -1,6 +1,7 @@
 ﻿using JobsScraper.BLL.Interfaces.DOU;
 using JobsScraper.BLL.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
@@ -9,10 +10,12 @@ namespace JobsScraper.BLL.Services.DOU
     public class DouHtmlLoader : IDouHtmlLoader
     {
         private readonly IConfiguration configuration;
+        private readonly ILogger<DouHtmlLoader> logger;
 
-        public DouHtmlLoader(IConfiguration configuration)
+        public DouHtmlLoader(IConfiguration configuration, ILogger<DouHtmlLoader> logger)
         {
             this.configuration = configuration;
+            this.logger = logger;
         }
 
         public Task<string?> LoadJobBoardHTMLAsync(string requestString, CancellationToken token)
@@ -25,7 +28,7 @@ namespace JobsScraper.BLL.Services.DOU
                 options.AddArgument("--disable-dev-shm-usage");
 
                 IWebDriver driver = new ChromeDriver(options);
-                string? douHtml;
+                string? douHtml = default;
 
                 try
                 {
@@ -59,6 +62,10 @@ namespace JobsScraper.BLL.Services.DOU
                     }
 
                     douHtml = driver.PageSource ?? null;
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "Error while loading data from DOU");
                 }
                 finally
                 {
