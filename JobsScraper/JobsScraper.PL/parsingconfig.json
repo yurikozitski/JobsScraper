@@ -33,7 +33,7 @@
     "ShortDomain": "https://robota.ua",
     "XPaths": {
       "VacancyListParent": "//alliance-jobseeker-desktop-vacancies-list",
-      "VacancyList": "//alliance-vacancy-card-desktop",
+      "VacancyList": ".//alliance-vacancy-card-desktop",
       "JobTitle": ".//h2",
       "Pagination": "//div[contains(@class, 'paginator')]"
     }
