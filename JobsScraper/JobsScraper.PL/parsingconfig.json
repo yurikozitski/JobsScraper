@@ -7,7 +7,7 @@
       "LocalLink": ".//a[@class = 'job-item__title-link']",
       "JobTitle": ".//a[@class = 'job-item__title-link']",
       "JobType": ".//div[@class = 'fw-medium d-flex flex-wrap align-items-center gap-1']",
-      "Company": ".//a[@class = 'text-body']",
+      "Company": ".//a[contains(@class, 'text-body')]",
       "PublicationDate": ".//span[@data-original-title]",
       "Salary": ".//span[@class = 'public-salary-item']",
       "Location": ".//span[@class = 'location-text']",
