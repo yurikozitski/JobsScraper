@@ -29,7 +29,7 @@ namespace JobsScraper.BLL.Services
         public async Task<IEnumerable<Vacancy>> GetVacanciesAsync(JobSearchModel jobSearchModel, CancellationToken token)
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-            cts.CancelAfter(TimeSpan.FromMilliseconds(60_000));
+            cts.CancelAfter(TimeSpan.FromMinutes(5));
 
             List<Vacancy> vacancies = new();
 
