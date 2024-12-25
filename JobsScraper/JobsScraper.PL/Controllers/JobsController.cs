@@ -21,7 +21,7 @@ namespace JobsScraper.PL.Controllers
         [HttpGet("find")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        //[ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
         public async Task<ActionResult<IEnumerable<Vacancy>>> GetJobs([FromQuery] JobSearchModel jobSearchModel, CancellationToken token)
         {
