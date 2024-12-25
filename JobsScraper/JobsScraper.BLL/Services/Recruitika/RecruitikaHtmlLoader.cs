@@ -28,7 +28,7 @@ namespace JobsScraper.BLL.Services.Recruitika
             }
             catch (HttpRequestException ex)
             {
-                this.logger.LogError(ex, "Unable to load page from djiini");
+                this.logger.LogError(ex, "Unable to load page from recrutika");
             }
 
             return recruitikaHtml;
