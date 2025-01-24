@@ -161,22 +161,34 @@ namespace JobsScraper.BLL.Services.Djinni
             if (grades != null)
             {
                 if (((Grades)grades).HasFlag(Grades.TraineeIntern))
-                    sb.Append("&exp_rank=trainee_intern");
+                {
+                    AddExperienceLevelPath(sb, ExperienceLevels.NoExperience);
+                }
 
                 if (((Grades)grades).HasFlag(Grades.Junior))
-                    sb.Append("&exp_rank=junior");
+                {
+                    AddExperienceLevelPath(sb, ExperienceLevels.NoExperience | ExperienceLevels.OneYear);
+                }
 
                 if (((Grades)grades).HasFlag(Grades.Middle))
-                    sb.Append("&exp_rank=middle");
+                {
+                    AddExperienceLevelPath(
+                        sb,
+                        ExperienceLevels.OneYear | ExperienceLevels.TwoYears | ExperienceLevels.ThreeYears);
+                }
 
                 if (((Grades)grades).HasFlag(Grades.Senior))
-                    sb.Append("&exp_rank=senior");
+                {
+                    AddExperienceLevelPath(
+                        sb,
+                        ExperienceLevels.ThreeYears | ExperienceLevels.FourYear | ExperienceLevels.FiveYearsAndAbove);
+                }
 
-                if (((Grades)grades).HasFlag(Grades.TeamLead))
-                    sb.Append("&exp_rank=team_lead");
-
-                if (((Grades)grades).HasFlag(Grades.HeadChief))
-                    sb.Append("&exp_rank=chief_head");
+                if (((Grades)grades).HasFlag(Grades.TeamLead)
+                    || ((Grades)grades).HasFlag(Grades.HeadChief))
+                {
+                    AddExperienceLevelPath(sb, ExperienceLevels.FiveYearsAndAbove);
+                }
             }
         }
 
